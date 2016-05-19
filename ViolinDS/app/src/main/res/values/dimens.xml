@@ -1,0 +1,35 @@
+<resources>
+
+    <dimen name="text_tiny">12sp</dimen>
+    <dimen name="text_small">14sp</dimen>
+    <dimen name="text_medium">16sp</dimen>
+    <dimen name="text_large">20sp</dimen>
+
+    <dimen name="actionbar_title">@dimen/text_medium</dimen>
+    <dimen name="actionbar_subtitle">@dimen/text_small</dimen>
+    <dimen name="actionbar_subtitle_margin">-4dp</dimen>
+
+    <dimen name="padding_quarter">2dp</dimen>
+    <dimen name="padding_half">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">32dp</dimen>
+    <dimen name="padding_huge">72dp</dimen>
+
+    <dimen name="popupmenu_divider">1dp</dimen>
+
+    <dimen name="list_row_height">48dp</dimen>
+    <dimen name="list_row_height_two_lines">72dp</dimen>
+    <dimen name="list_row_height_three_lines">96dp</dimen>
+    <dimen name="list_row_half_height">32dp</dimen>
+
+    <dimen name="padding_dialog">24dp</dimen>
+    <dimen name="dialog_question_height">@dimen/list_row_height</dimen>
+
+    <dimen name="shadow_height">4dp</dimen>
+
+    <dimen name="fab_medium">72dp</dimen>
+
+    <dimen name="tabbar_height">40dp</dimen>
+
+</resources>

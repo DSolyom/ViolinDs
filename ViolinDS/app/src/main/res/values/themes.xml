@@ -1,0 +1,85 @@
+<resources>
+    <style name="Theme.Transparent" parent="android:Theme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="Theme.Base" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+    </style>
+
+    <style name="Theme.App" parent="Theme.Base">
+        <item name="android:actionBarStyle">@style/Theme.App.ActionBar</item>
+        <item name="android:actionMenuTextColor">@color/actionbar_text</item>
+        <item name="android:actionBarWidgetTheme">@style/Theme.App.ActionBar.Widget</item>
+    </style>
+
+    <style name="Theme.App.Popup" parent="Theme.AppCompat.Light.NoActionBar">
+
+    </style>
+
+    <style name="Theme.Base.ActionBar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+    </style>
+
+    <style name="Theme.App.ActionBar" parent="Theme.Base.ActionBar">
+        <item name="android:background">@color/actionbar_bg</item>
+        <item name="android:titleTextStyle">@style/Theme.App.ActionBarTitle</item>
+        <item name="android:subtitleTextStyle">@style/Theme.App.ActionBarSubtitle</item>
+    </style>
+
+    <style name="Theme.App.ActionBar.Widget" parent="Theme.Base">
+        <item name="android:dropDownListViewStyle">@style/Theme.App.ActionBar.Widget.DropDown</item>
+        <item name="android:popupMenuStyle">@style/Theme.App.ActionBar.Widget.ListPopupWindow</item>
+        <item name="android:spinnerStyle">@style/Theme.App.ActionBar.Widget.Spinner</item>
+        <item name="android:itemBackground">@drawable/popupmenu_bg_selector</item>
+        <item name="android:actionDropDownStyle">@style/Theme.App.ActionBar.Widget.DropDown</item>
+        <item name="android:textColor">@color/popupmenu_text</item>
+    </style>
+
+    <style name="Theme.Base.ActionBarTitle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+    </style>
+
+    <style name="Theme.App.ActionBarTitle" parent="Theme.Base.ActionBarTitle">
+        <item name="android:textColor">@color/actionbar_text</item>
+    </style>
+
+    <style name="Theme.Base.ActionBarSubtitle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle">
+    </style>
+
+    <style name="Theme.App.ActionBarSubtitle" parent="Theme.Base.ActionBarSubtitle">
+        <item name="android:textColor">@color/actionbar_text</item>
+    </style>
+
+    <style name="Theme.Base.ActionBar.Widget.ListPopupWindow" parent="android:style/Widget.Holo.Light.ListPopupWindow">
+    </style>
+
+    <style name="Theme.App.ActionBar.Widget.ListPopupWindow" parent="Theme.Base.ActionBar.Widget.ListPopupWindow">
+        <item name="android:listSelector">@drawable/popupmenu_bg_selector</item>
+        <item name="android:divider">@color/popupmenu_divider</item>
+        <item name="android:dividerHeight">@dimen/popupmenu_divider</item>
+        <item name="android:textColor">@color/popupmenu_text</item>
+    </style>
+
+    <style name="Theme.Base.ActionBar.Widget.DropDown" parent="@android:style/Widget.Holo.Light.ListView.DropDown">
+    </style>
+
+    <style name="Theme.App.ActionBar.Widget.DropDown" parent="Theme.Base.ActionBar.Widget.DropDown">
+        <item name="android:listSelector">@drawable/popupmenu_bg_selector</item>
+        <item name="android:divider">@color/popupmenu_divider</item>
+        <item name="android:dividerHeight">@dimen/popupmenu_divider</item>
+        <item name="android:textColor">@color/popupmenu_text</item>
+    </style>
+
+    <style name="Theme.Base.ActionBar.Widget.Spinner" parent="android:style/Widget.Holo.Light.Spinner">
+    </style>
+
+    <style name="Theme.App.ActionBar.Widget.Spinner" parent="Theme.Base.ActionBar.Widget.Spinner">
+        <item name="android:listSelector">@drawable/popupmenu_bg_selector</item>
+        <item name="android:divider">@color/popupmenu_divider</item>
+        <item name="android:dividerHeight">@dimen/popupmenu_divider</item>
+        <item name="android:textColor">@color/popupmenu_text</item>
+    </style>
+</resources>

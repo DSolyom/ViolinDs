@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#FF6464</color>
+    <color name="primaryDark">#90FF6464</color>
+    <color name="primary_semi_transparent">#60FF6464</color>
+    <color name="accent">#FF4081</color>
+
+    <color name="background">#fefefe</color>
+    <color name="foreground">#ffffff</color>
+    <color name="text">#070707</color>
+    <color name="subtext">#bebebe</color>
+    <color name="title">#33b5e5</color>
+    <color name="text_inverse">#f3f3f3</color>
+
+    <color name="actionbar_bg">@color/primary</color>
+    <color name="actionbar_text">@color/text_inverse</color>
+    <color name="actionbar_title">#33b5e5</color>
+    <color name="actionbar_dialog_bg">@color/actionbar_bg</color>
+    <color name="actionbar_dialog_title">#33b5e5</color>
+    <color name="actionbar_search_bg">#FFFFFF</color>
+    <color name="actionbar_search_text">#070707</color>
+    <color name="actionbar_search_hint">#60070707</color>
+    <color name="actionbar_separator">#6633b5e5</color>
+    <color name="actionbar_title_separator">#33b5e5</color>
+    <color name="actionbar_item_bg_active">#6633b5e5</color>
+
+    <color name="popupmenu_bg">#F3F3F3</color>
+    <color name="popupmenu_bg_active">#33b5e5</color>
+    <color name="popupmenu_divider">#BEBEBE</color>
+    <color name="popupmenu_text">#333333</color>
+
+    <color name="shadow_dark">#50000000</color>
+    <color name="shadow_semidark">#40000000</color>
+    <color name="shadow_semilight">#10000000</color>
+    <color name="shadow_light">#00000000</color>
+
+    <color name="separator">#E0E0E0</color>
+
+    <color name="dialog_transparent">#50000000</color>
+    <color name="dialog_title">@color/text</color>
+    <color name="dialog_text">@color/subtext</color>
+</resources>

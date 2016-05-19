@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View android:id="@+id/app_bar" />
+    <View android:id="@+id/app_bar_shadow" />
+
+    <View android:id="@+id/container_list_header" />
+    <View android:id="@+id/container_list_footer" />
+</LinearLayout>

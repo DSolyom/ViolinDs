@@ -1,0 +1,141 @@
+<resources>
+
+    <!-- base -->
+
+    <style name="FillContainer">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+
+    <style name="Background" parent="FillContainer">
+        <item name="android:background">@color/background</item>
+    </style>
+
+    <style name="Container">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="VerticalContainer">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+
+    <style name="Block">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="InScrollContainer" parent="Block">
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <style name="PaddedContainer" parent="Container">
+        <item name="android:padding">@dimen/padding_medium</item>
+    </style>
+
+
+    <style name="SidePaddedContainer" parent="Container">
+        <item name="android:paddingLeft">16dip</item>
+        <item name="android:paddingRight">16dip</item>
+    </style>
+
+    <style name="Separator">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="ShadowBottom">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/shadow_height</item>
+        <item name="android:background">@drawable/shadow_bottom</item>
+    </style>
+
+    <style name="ShadowTop">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/shadow_height</item>
+        <item name="android:background">@drawable/shadow_top</item>
+    </style>
+
+    <style name="EmptySpace">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">0px</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <!-- Text -->
+
+    <style name="BaseText" parent="Block">
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="TinyText" parent="BaseText">
+        <item name="android:textSize">@dimen/text_tiny</item>
+    </style>
+
+    <style name="SmallText" parent="BaseText">
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <style name="Text" parent="BaseText">
+        <item name="android:textSize">@dimen/text_medium</item>
+    </style>
+
+    <style name="LargeText" parent="BaseText">
+        <item name="android:textSize">@dimen/text_large</item>
+    </style>
+
+    <style name="BaseTextInverse" parent="Block">
+        <item name="android:textColor">@color/text_inverse</item>
+    </style>
+
+    <style name="TinyTextInverse" parent="BaseTextInverse">
+        <item name="android:textSize">@dimen/text_tiny</item>
+    </style>
+
+    <style name="SmallTextInverse" parent="BaseTextInverse">
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <style name="TextInverse" parent="BaseTextInverse">
+        <item name="android:textSize">@dimen/text_medium</item>
+    </style>
+
+    <style name="LargeTextInverse" parent="BaseTextInverse">
+        <item name="android:textSize">@dimen/text_large</item>
+    </style>
+
+    <style name="SmallSubText" parent="TinyText">
+        <item name="android:textColor">@color/subtext</item>
+    </style>
+
+    <style name="SubText" parent="SmallText">
+        <item name="android:textColor">@color/subtext</item>
+    </style>
+
+    <style name="LargeSubText" parent="Text">
+        <item name="android:textColor">@color/subtext</item>
+    </style>
+
+    <style name="TinyTitleText" parent="TinyText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/title</item>
+    </style>
+
+    <style name="SmallTitleText" parent="SmallText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/title</item>
+    </style>
+
+    <style name="TitleText" parent="Text">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/title</item>
+    </style>
+
+    <style name="LargeTitleText" parent="LargeText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/title</item>
+    </style>
+
+</resources>
