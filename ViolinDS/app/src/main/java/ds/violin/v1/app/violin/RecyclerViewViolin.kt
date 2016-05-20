@@ -45,7 +45,7 @@ interface RecyclerViewViolin {
     /** =null - set before [RecyclerViewViolin.play] */
     var adapter: AbsRecyclerViewAdapter?
     /** =null - set before [RecyclerViewViolin.play] */
-    var adapterViewBinder: RecyclerViewAdapterBinding?
+    var adapterViewBinder: RecyclerViewAdapterBinder?
 
     /** = if true, will search in [PlayingViolin.parentViolin] too for header view */
     val parentCanHoldHeader: Boolean
@@ -204,7 +204,7 @@ interface RecyclerViewViolin {
  * !note: if you want to show when the list is empty or show/hide loading do that in the
  *        [IRecyclerView.headerView] or [IRecyclerView.footerView]
  */
-class RecyclerViewAdapterBinding(layoutManager: RecyclerView.LayoutManager) : ModelViewBinding<AbsRecyclerViewAdapter> {
+class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) : ModelViewBinding<AbsRecyclerViewAdapter> {
 
     override lateinit var rootView: View
     override lateinit var on: PlayingViolin
@@ -232,7 +232,7 @@ class RecyclerViewAdapterBinding(layoutManager: RecyclerView.LayoutManager) : Mo
 }
 
 /**
- * abstract class with the most basic things for a [RecyclerView.Adapter] to be used in a
+ * abstract class with the only thing for a [RecyclerView.Adapter] to be used in a
  * [RecyclerViewViolin]
  */
 abstract class AbsRecyclerViewAdapter(on: PlayingViolin) :

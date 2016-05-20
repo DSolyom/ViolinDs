@@ -77,14 +77,14 @@ interface LoadingViolin {
         val state = savedStates.remove(entityId)
         if (state != null) {
 
-            if (entity is HasSerializableData) {
-
-                /** had saved [Serializable] state */
-                entity.createDataFrom(state as Serializable)
-            } else {
+            if (entity is HasParcelableData) {
 
                 /** had saved [Parcelable] state */
-                (entity as HasParcelableData).createDataFrom(state  as Parcelable)
+                entity.createDataFrom(state  as Parcelable)
+            } else {
+
+                /** had saved [Serializable] state */
+                (entity as HasSerializableData).createDataFrom(state as Serializable)
             }
 
             // only valid entities could've been saved
@@ -199,13 +199,22 @@ interface LoadingViolin {
                 if (registered.entity is HasParcelableData) {
 
                     /** [Parcelable] */
-                    outState.putParcelable(STATE_PREFIX + entityId, registered.entity.dataToParcelable())
-                    idsOfParcelable.add(entityId)
+                    val dataInParcel = registered.entity.dataToParcelable()
+                    if (dataInParcel != null) {
+
+                        // only save if dataToParcelable returned something
+                        outState.putParcelable(STATE_PREFIX + entityId, dataInParcel)
+                        idsOfParcelable.add(entityId)
+                    }
                 } else if (registered.entity is HasSerializableData) {
 
                     /** [Serializable] */
                     val state = registered.entity.dataToSerializable()
-                    savedStates.put(entityId, state)
+                    if (state != null) {
+
+                        // only save if dataToSerializable returned something
+                        savedStates.put(entityId, state)
+                    }
                 }
             }
         }

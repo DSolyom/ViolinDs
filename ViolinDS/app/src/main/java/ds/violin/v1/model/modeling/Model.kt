@@ -157,11 +157,11 @@ open class MapModel(values: MutableMap<String, Any> = HashMap()) : MapModeling<A
 }
 
 /**
- * a [MapModeling] which [HasSerializableData] for SerializableMapEntity and as such
- * can only use [Serializable] data
+ * a [MapModeling] which is [Serializable] and [HasSerializableData] for SerializableMapEntity and
+ * as such can only use [Serializable] data
  */
 open class SerializableMapModel(values: MutableMap<String, Serializable> = HashMap()) :
-        MapModeling<Serializable>, HasSerializableData {
+        MapModeling<Serializable>, Serializable, HasSerializableData {
 
     override var values: MutableMap<String, Serializable>? = values
         set(value) {

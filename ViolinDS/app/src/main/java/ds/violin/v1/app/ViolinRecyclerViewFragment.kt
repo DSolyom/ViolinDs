@@ -29,7 +29,7 @@ abstract class ViolinRecyclerViewFragment : ViolinFragment(), RecyclerViewViolin
     override lateinit var recyclerView: IRecyclerView
     override var layoutManagerState: Parcelable? = null
     override var adapter: AbsRecyclerViewAdapter? = null
-    override var adapterViewBinder: RecyclerViewAdapterBinding? = null
+    override var adapterViewBinder: RecyclerViewAdapterBinder? = null
     override val parentCanHoldHeader: Boolean = true
     override val parentCanHoldFooter: Boolean = true
 

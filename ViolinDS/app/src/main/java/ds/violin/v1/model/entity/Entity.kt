@@ -29,8 +29,6 @@ import java.io.Serializable
  *
  * !note: use [BackgroundDataLoading] here as [dataLoader] if you need background work
  *        @see [BackgroundDataLoading] and @see [LoadingViolin] for more information
- *
- * TODO: better name? :P
  */
 interface SelfLoadable : Interruptable {
 
@@ -83,15 +81,23 @@ interface SelfLoadable : Interruptable {
     }
 }
 
+/**
+ * if an entity implements [HasSerializableData] and it is valid it's data will be saved in [LoadingViolin]s
+ * unless [dataToSerializable] returns null
+ */
 interface HasSerializableData {
 
-    fun dataToSerializable(): Serializable
+    fun dataToSerializable(): Serializable?
     fun createDataFrom(serializedData: Serializable)
 }
 
+/**
+ * if an entity implements [HasParcelableData] and it is valid it's data will be saved in [LoadingViolin]s
+ * unless [dataToParcelable] returns null
+ */
 interface HasParcelableData {
 
-    fun dataToParcelable(): Parcelable
+    fun dataToParcelable(): Parcelable?
     fun createDataFrom(parcelableData: Parcelable)
 }
 

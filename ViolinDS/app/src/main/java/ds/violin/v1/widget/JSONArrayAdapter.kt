@@ -23,16 +23,21 @@ import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.model.entity.SelfLoadableModelListing
 import ds.violin.v1.model.modeling.JSONArrayModelListing
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
+import ds.violin.v1.widget.adapter.SectionInfo
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
+import java.util.*
 
 /**
- * Parcelable data for [JSONArrayAdapter]
+ * Parcelable data for [JSONArrayAdapterEntity] to be able to save list and section data
  */
-class JSONArrayAdapterDataParcelable(modelsString: String) : Parcelable {
+class JSONArrayAdapterDataParcelable(modelsString: String,
+                                     sections: HashMap<Int, SectionInfo>,
+                                     sectionList: ArrayList<Int>) : Parcelable {
 
     companion object {
         @JvmField final val CREATOR: Parcelable.Creator<JSONArrayAdapterDataParcelable> = object :
@@ -48,11 +53,17 @@ class JSONArrayAdapterDataParcelable(modelsString: String) : Parcelable {
     }
 
     val modelsString: String = modelsString
+    val sections: HashMap<Int, SectionInfo> = sections
+    val sectionList: ArrayList<Int> = sectionList
 
-    constructor(source: Parcel) : this(source.readString())
+    constructor(source: Parcel) : this(source.readString(),
+            source.readSerializable() as HashMap<Int, SectionInfo>,
+            source.readSerializable() as ArrayList<Int>)
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
         dest!!.writeString(modelsString)
+        dest.writeSerializable(sections)
+        dest.writeSerializable(sectionList)
     }
 
     override fun describeContents(): Int {
@@ -66,17 +77,10 @@ class JSONArrayAdapterDataParcelable(modelsString: String) : Parcelable {
  * this type of adapter can be used for [IRecyclerView]s when the data is already present
  */
 abstract class JSONArrayAdapter(on: PlayingViolin, models: JSONArray = JSONArray()) :
-        AbsHeaderedAdapter<JSONArray, JSONObject>(on), JSONArrayModelListing, HasParcelableData {
+        AbsHeaderedAdapter<JSONArray, JSONObject>(on), JSONArrayModelListing {
 
     override var models: JSONArray = models
 
-    override fun dataToParcelable(): Parcelable {
-        return JSONArrayAdapterDataParcelable(models.toString())
-    }
-
-    override fun createDataFrom(parcelableData: Parcelable) {
-        models = JSONArray((parcelableData as JSONArrayAdapterDataParcelable).modelsString)
-    }
 }
 
 /**
@@ -86,11 +90,21 @@ abstract class JSONArrayAdapter(on: PlayingViolin, models: JSONArray = JSONArray
  * this type of adapter can be used for [IRecyclerView]s when the data requires loading
  */
 abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
-        JSONArrayAdapter(on, models), AbsRecyclerViewAdapterEntity {
+        JSONArrayAdapter(on, models), AbsRecyclerViewAdapterEntity,
+        SelfLoadableModelListing<JSONArray, JSONObject>, HasParcelableData {
 
     override var interrupted: Boolean = false
     override var valid: Boolean = false
 
     override var dataLoader: DataLoading = dataLoader
 
+    override fun dataToParcelable(): Parcelable {
+        return JSONArrayAdapterDataParcelable(models.toString(), sections, sectionList)
+    }
+
+    override fun createDataFrom(parcelableData: Parcelable) {
+        models = JSONArray((parcelableData as JSONArrayAdapterDataParcelable).modelsString)
+        sections = parcelableData.sections
+        sectionList = parcelableData.sectionList
+    }
 }

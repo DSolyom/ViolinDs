@@ -83,8 +83,8 @@ abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoa
      * to load the list continuously [get] should be called with a completion block which notify
      * about range insertion or removal
      */
-    override fun getRowDataModel(position: Int): Modeling<*> {
-        return get(position, { entity, error ->
+    override fun getRowDataModel(dataPosition: Int): Modeling<*> {
+        return get(dataPosition, { entity, error ->
             if (error == null) {
                 val newItemsAdded = sizeChange + offsetChange
                 if (newItemsAdded > 0) {
