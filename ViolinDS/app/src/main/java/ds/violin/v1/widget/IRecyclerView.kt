@@ -18,12 +18,164 @@ package ds.violin.v1.widget
 
 import android.content.Context
 import android.os.Parcelable
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
+import ds.violin.v1.app.violin.RecyclerViewViolin
+import ds.violin.v1.viewmodel.AbsModelRowBinder
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
 
-class IRecyclerView : RecyclerView {
+/**
+ * Sticky section headers for [IRecyclerView] with [LinearLayoutManager] and [AbsHeaderedAdapter]
+ *
+ * @use: just add this as a view to your layout, preferable above of the top of your [IRecyclerView]
+ *       and set it's [recyclerView] in [RecyclerViewViolin.play]
+ */
+open class StickyHeader : FrameLayout {
+
+    /** the connected recycler view */
+    var recyclerView: IRecyclerView? = null
+        set(value) {
+            if (field == value) {
+                return
+            }
+
+            if (field != null) {
+                field!!.removeOnScrollListener(onScroll)
+            }
+            field = value
+            if (field != null) {
+                field!!.addOnScrollListener(onScroll)
+            }
+
+            currentSection = null
+            visibility = View.GONE
+        }
+
+    /** selected section */
+    var currentSection: Int? = null
+
+    /** */
+    lateinit var onScroll: RecyclerView.OnScrollListener
+
+    /** the [AbsModelRowBinder] for the header */
+    var headerBinder: AbsModelRowBinder? = null
+        set(value) {
+            field = value
+            if (field != null) {
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
+        }
+
+    constructor(context: Context) : super(context) {
+        init()
+    }
+
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        init()
+    }
+
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
+        init()
+    }
+
+    fun init() {
+
+        /** start [View.GONE] just in case */
+        visibility = View.GONE
+
+        val sh = this
+        onScroll = object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val adapter = recyclerView.adapter ?: return
+                if (adapter !is AbsHeaderedAdapter<*, *>) {
+                    throw UnsupportedOperationException("StickyHeader only works with AbsHeaderedAdapter")
+                }
+                val layoutManager = recyclerView.layoutManager ?: return
+                if (layoutManager !is LinearLayoutManager) {
+                    throw UnsupportedOperationException("StickyHeader only works with LinearLayoutManager")
+                }
+
+                /** first item's position in the recycler view and it's section */
+                val firstPosition = layoutManager.findFirstVisibleItemPosition()
+                val section = adapter.sectionFor(firstPosition)
+
+                if (currentSection == null || section != currentSection) {
+
+                    /** section change */
+                    if (section != null) {
+
+                        /** set new section */
+                        currentSection = section
+                        val sectionStart = adapter.sectionList[section]
+
+                        /** get same (type) binder from the adapter as the section's header's */
+                        headerBinder = adapter.onCreateViewHolder(sh,
+                                adapter.getItemViewType(sectionStart)) as AbsModelRowBinder
+
+                        /** add the sticky header view */
+                        removeAllViewsInLayout()
+                        addView(headerBinder!!.rootView)
+                        headerBinder!!.bind(adapter.sections[sectionStart]!!)
+                        val rootView = headerBinder!!.rootView
+                        val lp = rootView.layoutParams as FrameLayout.LayoutParams
+                        if (lp.bottomMargin < 0) {
+
+                            /**
+                             * sometimes section header's have negative bottom margin which if left
+                             * alone will render our header more or less gone
+                             */
+                            lp.bottomMargin = 0
+                        }
+
+                        /** we need [headerBinder.getRootView.getMeasuredHeight] valid asap for 'push out' effect */
+                        rootView.measure(lp.width, lp.height)
+                    } else {
+
+                        /** remove current section - there is no section info for some of the first items */
+                        currentSection = null
+                        headerBinder = null
+                    }
+
+                }
+
+                if (adapter.sections.containsKey(firstPosition)) {
+
+                    /** first section should now be invisible not to see double of it */
+                    recyclerView.getChildAt(0).visibility = View.INVISIBLE
+                }
+
+                /** the rest of the headers' visibility should be restored */
+                for (i in 1..recyclerView.childCount-1) {
+                    if (adapter.sections.containsKey(firstPosition + i)) {
+                        recyclerView.getChildAt(i).visibility = View.VISIBLE
+                    }
+                }
+
+                if (currentSection != null) {
+
+                    /** create 'push out' effect */
+                    val rootView = headerBinder!!.rootView
+                    val lp = rootView.layoutParams as FrameLayout.LayoutParams
+                    if (recyclerView.childCount > 1 && adapter.sections.containsKey(firstPosition + 1)) {
+                        val secondPos = recyclerView.getChildAt(1).top
+                        lp.topMargin = Math.min(0, secondPos - rootView.measuredHeight)
+                    } else {
+                        lp.topMargin = 0
+                    }
+                    rootView.layoutParams = lp
+                }
+            }
+        }
+    }
+}
+
+open class IRecyclerView : RecyclerView {
 
     /** header for the recycler view */
     var headerView: View? = null
@@ -61,7 +213,9 @@ class IRecyclerView : RecyclerView {
             return
         }
 
-        if (adapter is  AbsHeaderedAdapter<*, *>) {
+        if (adapter is AbsHeaderedAdapter<*, *>) {
+
+            /** set [adapter.headerView] and [adapter.footerView] if those were here before the adapter */
             adapter.headerView = headerView
             adapter.footerView = footerView
         }

@@ -50,7 +50,7 @@ open class sectionHeaderAndRowBinder(sectionHeaderBinder: AbsModelRowBinder, row
 }
 
 /**
- * an adapter with headers for [RecyclerViewViolin]s and headers for it's rows (to handle sections)
+ * an adapter with headers for IRecyclerViews and [sections] (section headers)
  */
 abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
         AbsRecyclerViewAdapter(on), ModelListing<LIST, MODEL> {
@@ -96,7 +96,7 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
      * !note: call from ui thread for adapters already added to a recycler view as this will change
      *        the adapters [getItemCount] and behavior
      */
-    fun generateSections(sectionsInfo: HashMap<Int, String>) {
+    fun generateSections(sectionsInfo: LinkedHashMap<Int, String>) {
         sections.clear()
         sectionList.clear()
 
@@ -122,7 +122,7 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
         while(true) {
             val slp = sectionList[prox]
             if (slp <= position) {
-                if (prox == sectionCount - 1 || sectionList[prox + 1] > slp) {
+                if (prox == sectionCount - 1 || sectionList[prox + 1] > position) {
                     return prox
                 }
                 prox = (sectionCount + prox + 1) / 2
