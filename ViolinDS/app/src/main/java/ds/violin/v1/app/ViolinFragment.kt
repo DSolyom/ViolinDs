@@ -42,6 +42,8 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override var idsOfParcelable: ArrayList<String> = ArrayList()
     override var idsOfLoaded: ArrayList<String> = ArrayList()
 
+    override val requestedPermissions: MutableMap<String, PlayingViolin.RequestedPermission> = HashMap()
+
     override fun onAttach(activity: Activity) {
         super<DialogFragment>.onAttach(activity)
         super<FragmentViolin>.onAttach(activity as PlayingViolin)
@@ -112,5 +114,10 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override fun stopEverything() {
         super<LoadingViolin>.stopEverything()
         super<FragmentViolin>.stopEverything()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super<DialogFragment>.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        super<FragmentViolin>.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

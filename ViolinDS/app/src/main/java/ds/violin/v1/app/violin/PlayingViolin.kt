@@ -19,7 +19,11 @@ package ds.violin.v1.app.violin
 import android.app.Fragment
 import android.app.Activity
 import android.app.DialogFragment
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.ViewGroup
 import ds.violin.v1.app.ViolinActivity
@@ -30,6 +34,10 @@ import java.io.Serializable
 import java.util.*
 
 interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
+
+    companion object {
+        const val PERMISSION_REQUEST_CODE = 16183
+    }
 
     /** = HashMap(), sub controllers (ie. fragments in an activity, ...) */
     val violins: HashMap<String, PlayingViolin>
@@ -46,9 +54,14 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     /** = null, #PrivateSet - parent for this Violin (activity for fragments, fragment for child fragments) */
     var parentViolin: PlayingViolin?
 
-    /** lateinit - #PrivateSet - the [ActivityViolin] every [FragmentViolin] is in,
-    and 'this' for the [ActivityViolin] itself */
+    /**
+     * fragment: lateinit - #PrivateSet - the [ActivityViolin] every [FragmentViolin] is in
+     * activity: 'this' - #PrivateSet
+     */
     var violinActivity: ActivityViolin
+
+    /** = HashMap, #Private */
+    val requestedPermissions: MutableMap<String, RequestedPermission>
 
     /**
      * is this violin currently active? (visible and user interactions are enabled)
@@ -87,18 +100,23 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
 
     /**
      * handle activity result here, will trigger [onActivityResult] in all child Violins
-     * [ActivityViolin]: call if this is needed, calling this will also call [play]
+     * [ActivityViolin]: call if this is needed, calling this will also call [play] if [canPlay]
      */
-    fun onActivityResult(requestCode: Int, result: Any?) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, result: Any?) {
 
         for (violin in violins.values) {
-            violin.onActivityResult(requestCode, result)
+            violin.onActivityResult(requestCode, resultCode, result)
         }
 
         if (canPlay()) {
             play()
         }
     }
+
+    /**
+     * Instance State
+     *
+     * ---------------------------------------------------------------------------------------- */
 
     /**
      * restore instance state
@@ -151,6 +169,78 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
         val dialog = fragmentDialog!!.dialog
         if (dialog != null && !dialog.isShowing) {
             fragmentDialog.dismiss();
+        }
+    }
+
+    /**
+     * Permissions
+     *
+     * ---------------------------------------------------------------------------------------- */
+
+    class RequestedPermission(val permissions: Array<String>, val completion: (Array<out String>, IntArray) -> Unit)
+
+    fun askUserForPermission(permissionPackId: String,
+                             permissions: Array<String>,
+                             completion: (Array<out String>, IntArray) -> Unit) {
+        var needPermission = false
+        var needRationale = false
+        for(permission in permissions) {
+            if (ContextCompat.checkSelfPermission(violinActivity as Context,
+                    permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                needPermission = true
+                if (ActivityCompat.shouldShowRequestPermissionRationale(violinActivity as Activity,
+                        permission)) {
+                    needRationale = true
+                    break
+                }
+            }
+        }
+        if (needRationale) {
+            showRequestPermissionRationale(permissionPackId) {
+                requestPermissions(permissions)
+                requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
+            }
+        } else if (needPermission) {
+            requestPermissions(permissions)
+            requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
+        }
+    }
+
+    /**
+     * override to
+     * - show request permission rationale (dialog explaining why the permissions with [permissionPackId] is required)
+     * and call onAgreed if user accepted the request
+     * - or just do nothing if the app can work without the permission
+     *
+     * @param permissionPackId
+     * @param onAgreed
+     */
+    fun showRequestPermissionRationale(permissionPackId: String, onAgreed: () -> Unit) {}
+
+    fun requestPermissions(permissions: Array<String>) {
+        ActivityCompat.requestPermissions(violinActivity as Activity,
+                permissions, PERMISSION_REQUEST_CODE)
+    }
+
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+
+            // find the requested permission group
+            for(requestedPermission in requestedPermissions.values) {
+                var found = true
+                for(permission in requestedPermission.permissions) {
+                    if (!permissions.contains(permission)) {
+                        found = false
+                        break
+                    }
+                }
+                if (found) {
+                    requestedPermission.completion(permissions, grantResults)
+                    break
+                }
+            }
         }
     }
 

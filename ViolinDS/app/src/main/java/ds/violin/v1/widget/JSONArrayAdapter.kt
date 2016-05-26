@@ -18,11 +18,11 @@ package ds.violin.v1.widget
 
 import android.os.Parcel
 import android.os.Parcelable
-import ds.violin.v1.app.violin.AbsRecyclerViewAdapterEntity
 import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.model.entity.SelfLoadable
 import ds.violin.v1.model.entity.SelfLoadableModelListing
 import ds.violin.v1.model.modeling.JSONArrayModelListing
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
@@ -84,14 +84,13 @@ abstract class JSONArrayAdapter(on: PlayingViolin, models: JSONArray = JSONArray
 }
 
 /**
- * abstract class for the most basic [AbsHeaderedAdapter] [AbsRecyclerViewAdapterEntity] with data
- * held in the form of a [JSONArrayModelListing]
+ * abstract class for the most basic [AbsHeaderedAdapter] with data held in the form of a
+ * [JSONArrayModelListing]
  *
  * this type of adapter can be used for [IRecyclerView]s when the data requires loading
  */
 abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
-        JSONArrayAdapter(on, models), AbsRecyclerViewAdapterEntity,
-        SelfLoadableModelListing<JSONArray, JSONObject>, HasParcelableData {
+        JSONArrayAdapter(on, models), SelfLoadableModelListing<JSONArray, JSONObject>, HasParcelableData {
 
     override var interrupted: Boolean = false
     override var valid: Boolean = false

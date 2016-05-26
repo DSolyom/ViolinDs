@@ -37,8 +37,8 @@ interface LoadingViolin {
         val IDS_OF_LOADED = "__loadingviolinidsofloaded_"
     }
 
-    data class RegisteredEntity(val entity: SelfLoadable,
-                                val completionOnLoad: (entity: SelfLoadable, Throwable?) -> Unit)
+    class RegisteredEntity(val entity: SelfLoadable,
+                           val completionOnLoad: (entity: SelfLoadable, Throwable?) -> Unit)
 
     /** = HashMap(), #Private - holds the [RegisteredEntity]s - @see [registerEntity] */
     val registeredEntities: MutableMap<String, RegisteredEntity>
@@ -145,7 +145,7 @@ interface LoadingViolin {
      * @see [PlayingViolin.invalidateRegisteredEntities]
      */
     fun invalidateRegisteredEntities(subViolinsToo: Boolean = false) {
-        for(registered in registeredEntities.values) {
+        for (registered in registeredEntities.values) {
             interruptEntity(registered.entity)
             registered.entity.valid = false
         }
@@ -169,7 +169,7 @@ interface LoadingViolin {
 
         /** saved parcelable data ids - put parcelable data in saved states too according to these */
         idsOfParcelable = savedInstanceState.getStringArrayList(IDS_OF_PARCELABLE)
-        for(id in idsOfParcelable) {
+        for (id in idsOfParcelable) {
             savedStates.put(id, savedInstanceState.getParcelable(STATE_PREFIX + id))
         }
     }

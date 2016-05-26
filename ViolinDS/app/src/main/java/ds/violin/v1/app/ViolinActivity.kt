@@ -16,6 +16,7 @@
 
 package ds.violin.v1.app
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -33,10 +34,11 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
     override var rootView: View? = null
     override var rootViewId: Int? = null
     override var parentViolin: PlayingViolin? = null
-    override lateinit var violinActivity: ActivityViolin
+    override var violinActivity: ActivityViolin = this
     override var activityActivated: Boolean = false
     override var transportData: Serializable? = NoTransportData
     override var activityResult: Any? = null
+    override var activityResultCode: Int = Activity.RESULT_OK
     override var afterTransport: Boolean = false
     override var hasSceneTransition: Boolean = false
     override var enterTransitionPostponed: Boolean = false
@@ -46,6 +48,7 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
     override var excludeAppBarFromTransportAnimation: Boolean = false
     override var excludeNavigationBarFromTransportAnimation: Boolean = false
     override var excludeStatusBarFromTransportAnimation: Boolean = false
+    override val requestedPermissions: MutableMap<String, PlayingViolin.RequestedPermission> = HashMap()
 
     override fun play() {
         // do your magic here
@@ -79,5 +82,10 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
         super.onSaveInstanceState(outState)
 
         saveInstanceState(outState)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super<ActivityViolin>.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        super<AppCompatActivity>.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

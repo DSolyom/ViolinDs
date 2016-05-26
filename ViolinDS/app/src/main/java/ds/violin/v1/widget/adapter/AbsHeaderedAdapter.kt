@@ -114,7 +114,7 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
      */
     fun sectionFor(position: Int): Int? {
         if (sections.isEmpty()) {
-            return -1
+            return null
         }
 
         val sectionCount = sectionList.size
@@ -227,7 +227,7 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
                     null -> 0
                     else -> 1
                 } +
-                when (headerView) {
+                when (footerView) {
                     null -> 0
                     else -> 1
                 }

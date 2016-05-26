@@ -34,6 +34,7 @@ interface RecyclerViewViolin {
 
     companion object {
         const val TAG_LM_STATE = "__recyclerviewviolin_lm_state_"
+        const val TAG_ENTITY_ADAPTER = "__recyclerviewviolin_adapter__"
     }
 
     /** #Private - the recycler view's id */
@@ -54,8 +55,7 @@ interface RecyclerViewViolin {
 
     /**
      * finding the [recyclerView]
-     * !note: call before [FragmentViolin.onViewCreated] or any other
-     *        Violin's onViewCreated with [PlayingViolin.play]
+     * !note: call before any other Violin's onViewCreated
      */
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         recyclerView = (this as PlayingViolin).findViewById(recyclerViewID) as IRecyclerView
@@ -70,10 +70,16 @@ interface RecyclerViewViolin {
             ensureListHeaderAndFooter()
         }
 
-        if (adapter is AbsRecyclerViewAdapterEntity) {
-            (adapter as AbsRecyclerViewAdapterEntity).register(this) { adapter, error ->
+        if (adapter is SelfLoadable && this is LoadingViolin) {
+
+            /** register adapter for loading */
+            registerEntity(TAG_ENTITY_ADAPTER, adapter as SelfLoadable) { adapter, error ->
                 onAdapterLoadFinished(error)
             }
+        } else {
+
+            /** just bind the adapter (via [onAdapterLoadFinished]) */
+            onAdapterLoadFinished(null)
         }
     }
 
@@ -88,7 +94,7 @@ interface RecyclerViewViolin {
             }
 
             /** bind the [adapter] to the [recyclerView] */
-            adapterViewBinder!!.bind(this.adapter!!, recyclerView, this as PlayingViolin)
+            adapterViewBinder!!.bind(adapter!!, recyclerView, this as PlayingViolin)
         } else {
             Debug.logException(error)
         }
@@ -109,13 +115,13 @@ interface RecyclerViewViolin {
         }
 
         val listHeader = createHeaderViewFor(recyclerView, this as PlayingViolin)
-        if (listHeader != null && (listHeader !is ViewGroup || listHeader.childCount > 0)) {
+        if (listHeader != null) {
             (listHeader.parent as ViewGroup?)?.removeView(listHeader)
             recyclerView.headerView = listHeader
         }
 
         val listFooter = createFooterViewFor(recyclerView, this)
-        if (listFooter != null && (listFooter !is ViewGroup || listFooter.childCount > 0)) {
+        if (listFooter != null) {
             (listFooter.parent as ViewGroup?)?.removeView(listFooter)
             recyclerView.footerView = listFooter
         }
@@ -199,12 +205,12 @@ interface RecyclerViewViolin {
 }
 
 /**
- * base interface for binding [AbsRecyclerViewAdapterEntity] to the [IRecyclerView]
+ * base interface for binding [AbsRecyclerViewAdapter] to the [IRecyclerView]
  *
  * !note: if you want to show when the list is empty or show/hide loading do that in the
  *        [IRecyclerView.headerView] or [IRecyclerView.footerView]
  */
-class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) : ModelViewBinding<AbsRecyclerViewAdapter> {
+open class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) : ModelViewBinding<AbsRecyclerViewAdapter> {
 
     override lateinit var rootView: View
     override lateinit var on: PlayingViolin
@@ -232,26 +238,11 @@ class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) : Mod
 }
 
 /**
- * abstract class with the only thing for a [RecyclerView.Adapter] to be used in a
+ * abstract class with the things required for a [RecyclerView.Adapter] to be used in a
  * [RecyclerViewViolin]
  */
 abstract class AbsRecyclerViewAdapter(on: PlayingViolin) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val on: PlayingViolin = on
-}
-
-/**
- * interface for an entity with the most basic things for an [AbsRecyclerViewAdapter] to be used in a
- * [LoadingViolin] + [RecyclerViewViolin] environment
- */
-interface AbsRecyclerViewAdapterEntity : SelfLoadable {
-
-    companion object {
-        val TAG_ENTITY_ADAPTER = "__adapter__"
-    }
-
-    fun register(violin: RecyclerViewViolin, completion: (SelfLoadable?, Throwable?) -> Unit) {
-        (violin as LoadingViolin).registerEntity(TAG_ENTITY_ADAPTER, this, completion)
-    }
 }

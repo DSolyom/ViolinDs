@@ -42,7 +42,8 @@ interface ActivityViolin : PlayingViolin {
         const val GOBACKTO_ACTION = "DS_Gobackto_Action"
         const val FINISH_ALL_ACTION = "DS_Finish_All_Action"
 
-        const val TRANSPORT_ACTION_CODE = 50345
+        const val TRANSPORT_ACTION_CODE = 2013
+        const val ONACTIVITYRESULT_RESULT_CODE = "DS_OnActivityResult_Result_Code"
         const val ACTION_MODE_BAR = 0
         const val ACTION_MODE_SEARCH = 1
 
@@ -58,6 +59,8 @@ interface ActivityViolin : PlayingViolin {
     var transportData: Serializable?
     /** = null, #Private */
     var activityResult: Any?
+    /** = RESULT_OK, #Private */
+    var activityResultCode: Int
     /** = false, #Private */
     var afterTransport: Boolean
 
@@ -87,8 +90,6 @@ interface ActivityViolin : PlayingViolin {
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState)
         }
-
-        violinActivity = this
 
         val asActivity = this as Activity
 
@@ -195,7 +196,7 @@ interface ActivityViolin : PlayingViolin {
                 GOBACK_ACTION -> {
 
                     /** after [goBack] 1 step or steps are handled via manifest definition of this activity */
-                    onActivityResult(TRANSPORT_ACTION_CODE, transportData)
+                    onActivityResult(TRANSPORT_ACTION_CODE, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData)
                     removeSavedTransportData()
                 }
                 GOBACKTO_ACTION -> {
@@ -212,7 +213,7 @@ interface ActivityViolin : PlayingViolin {
                     } else {
 
                         /** we were the target */
-                        onActivityResult(TRANSPORT_ACTION_CODE, transportData)
+                        onActivityResult(TRANSPORT_ACTION_CODE, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData)
                     }
                 }
             }
@@ -235,16 +236,14 @@ interface ActivityViolin : PlayingViolin {
     /**
      * #Private except for: call as super from [Activity.onActivityResult]
      *          this is to merge [goBackTo] with normal [Activity.onActivityResult]
-     * !note: still need to handle failure when result code is not [Activity.RESULT_OK]
      */
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (resultCode == Activity.RESULT_OK && intent != null) {
+        if (intent != null) {
             if (intent.action == null || intent.action.length == 0) {
                 intent.action = ONACTIVITYRESULT_ACTION
             }
+            intent.putExtra(ONACTIVITYRESULT_RESULT_CODE, resultCode)
             onEnter(intent)
-        } else {
-            removeTransportData(intent)
         }
     }
 
@@ -252,11 +251,12 @@ interface ActivityViolin : PlayingViolin {
         return activityActivated
     }
 
-    override fun onActivityResult(requestCode: Int, result: Any?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, result: Any?) {
         if (violins.isEmpty()) {
             activityResult = result
+            activityResultCode = resultCode
         }
-        super.onActivityResult(requestCode, result)
+        super.onActivityResult(requestCode, resultCode, result)
     }
 
     override fun onViolinAttached(violin: PlayingViolin) {
@@ -265,7 +265,7 @@ interface ActivityViolin : PlayingViolin {
                 violin.onTransport(transportData)
             }
             if (activityResult != null) {
-                violin.onActivityResult(TRANSPORT_ACTION_CODE, activityResult)
+                violin.onActivityResult(TRANSPORT_ACTION_CODE, activityResultCode, activityResult)
             }
         }
         activityResult = null
@@ -286,6 +286,7 @@ interface ActivityViolin : PlayingViolin {
         intent.action = "";
         intent.removeExtra("transport-data");
         intent.removeExtra("back-target");
+        intent.removeExtra(ONACTIVITYRESULT_RESULT_CODE)
     }
 
     /**
