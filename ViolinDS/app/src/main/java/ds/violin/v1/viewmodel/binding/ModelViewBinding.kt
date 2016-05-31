@@ -45,5 +45,8 @@ interface ModelViewBinding<MODEL> : ViewBinding {
         bind(model)
     }
 
+    /**
+     * bind your [model] to the preset [rootView]
+     */
     fun bind(model: MODEL)
 }

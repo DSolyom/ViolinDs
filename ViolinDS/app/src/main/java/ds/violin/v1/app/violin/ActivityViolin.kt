@@ -59,6 +59,8 @@ interface ActivityViolin : PlayingViolin {
     var transportData: Serializable?
     /** = null, #Private */
     var activityResult: Any?
+    /** = TRANSPORT_ACTION_CODE, #Private */
+    var activityRequestCode: Int
     /** = RESULT_OK, #Private */
     var activityResultCode: Int
     /** = false, #Private */
@@ -196,7 +198,7 @@ interface ActivityViolin : PlayingViolin {
                 GOBACK_ACTION -> {
 
                     /** after [goBack] 1 step or steps are handled via manifest definition of this activity */
-                    onActivityResult(TRANSPORT_ACTION_CODE, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData)
+                    onActivityResult(activityRequestCode, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData)
                     removeSavedTransportData()
                 }
                 GOBACKTO_ACTION -> {
@@ -213,8 +215,11 @@ interface ActivityViolin : PlayingViolin {
                     } else {
 
                         /** we were the target */
-                        onActivityResult(TRANSPORT_ACTION_CODE, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData)
+                        onActivityResult(activityRequestCode, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData)
                     }
+                }
+                ONACTIVITYRESULT_ACTION -> {
+                    onActivityResult(activityRequestCode, intent.getIntExtra(ONACTIVITYRESULT_RESULT_CODE, Activity.RESULT_OK), transportData ?: intent as Any?)
                 }
             }
 
@@ -230,6 +235,7 @@ interface ActivityViolin : PlayingViolin {
     }
 
     fun onNewIntent(intent: Intent) {
+        removeSavedTransportData()  // TODO: can we have this here? or onNewIntent can be called before onViolinAttached finishes
         onEnter(intent)
     }
 
@@ -237,13 +243,16 @@ interface ActivityViolin : PlayingViolin {
      * #Private except for: call as super from [Activity.onActivityResult]
      *          this is to merge [goBackTo] with normal [Activity.onActivityResult]
      */
-    fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (intent != null) {
-            if (intent.action == null || intent.action.length == 0) {
-                intent.action = ONACTIVITYRESULT_ACTION
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (data != null) {
+            if (data.action == null || data.action.length == 0) {
+                data.action = ONACTIVITYRESULT_ACTION
             }
-            intent.putExtra(ONACTIVITYRESULT_RESULT_CODE, resultCode)
-            onEnter(intent)
+            data.putExtra(ONACTIVITYRESULT_RESULT_CODE, resultCode)
+
+            removeSavedTransportData()
+            activityRequestCode = requestCode
+            onEnter(data)
         }
     }
 
@@ -265,7 +274,7 @@ interface ActivityViolin : PlayingViolin {
                 violin.onTransport(transportData)
             }
             if (activityResult != null) {
-                violin.onActivityResult(TRANSPORT_ACTION_CODE, activityResultCode, activityResult)
+                violin.onActivityResult(activityRequestCode, activityResultCode, activityResult)
             }
         }
         activityResult = null

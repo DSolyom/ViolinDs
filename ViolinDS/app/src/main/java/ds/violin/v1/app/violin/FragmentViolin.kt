@@ -17,6 +17,7 @@
 package ds.violin.v1.app.violin
 
 import android.app.Fragment
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -128,5 +129,14 @@ interface FragmentViolin : PlayingViolin {
 
     override fun canPlay(): Boolean {
         return rootView != null && parentViolin != null
+    }
+
+
+    /**
+     * when this is a dialog and not a normal fragment it would handle onActivityResult instead
+     * of the [violinActivity]
+     */
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        violinActivity?.onActivityResult(requestCode, resultCode, data)
     }
 }

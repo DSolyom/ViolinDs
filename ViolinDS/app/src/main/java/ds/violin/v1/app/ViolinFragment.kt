@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.DialogFragment
 import android.app.Fragment
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -119,5 +120,10 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super<DialogFragment>.onRequestPermissionsResult(requestCode, permissions, grantResults)
         super<FragmentViolin>.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super<FragmentViolin>.onActivityResult(requestCode, resultCode, data)
+        super<DialogFragment>.onActivityResult(requestCode, resultCode, data)
     }
 }

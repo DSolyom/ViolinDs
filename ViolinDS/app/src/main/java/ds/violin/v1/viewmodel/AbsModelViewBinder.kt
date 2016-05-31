@@ -24,7 +24,7 @@ import ds.violin.v1.viewmodel.binding.ModelViewBinding
 /**
  * basic [ModelViewBinding] for any [Modeling]
  */
-abstract class AbsBasicModelViewBinder(on: PlayingViolin, view: View) : ModelViewBinding<Modeling<*>?> {
+abstract class AbsModelViewBinder(on: PlayingViolin, view: View) : ModelViewBinding<Modeling<*>?> {
 
     override var on: PlayingViolin = on
     override var rootView: View = view

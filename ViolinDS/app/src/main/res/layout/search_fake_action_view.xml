@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:violin="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+    >
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_half"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:layout_marginRight="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_half"
+        violin:cardBackgroundColor="@android:color/white"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <!-- Search Input -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/padding_half"
+                android:paddingRight="@dimen/padding_half"
+                >
+
+                <ImageView
+                    android:id="@+id/btn_search_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:focusable="true"
+                    android:paddingLeft="@dimen/padding_small"
+                    android:paddingRight="@dimen/padding_small"
+                    android:src="@drawable/ic_search_close"
+                    android:tint="#A0FFFFFF"
+                    />
+
+                <EditText
+                    android:id="@+id/et_search"
+                    style="@style/Text"
+                    android:layout_width="0dp"
+                    android:layout_height="36dip"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:ellipsize="end"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text|textAutoComplete|textNoSuggestions"
+                    android:minWidth="160dp"
+                    android:paddingLeft="@dimen/padding_small"
+                    android:paddingRight="@dimen/padding_small"
+                    android:singleLine="true"
+                    />
+
+                <ImageView
+                    android:id="@+id/btn_search_voice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:focusable="true"
+                    android:paddingLeft="@dimen/padding_small"
+                    android:paddingRight="@dimen/padding_small"
+                    android:src="@drawable/ic_search_voice"
+                    />
+
+                <ImageView
+                    android:id="@+id/btn_search_clear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:focusable="true"
+                    android:paddingLeft="@dimen/padding_small"
+                    android:paddingRight="@dimen/padding_small"
+                    android:src="@drawable/ic_search_clear"
+                    android:visibility="gone"
+                    />
+            </LinearLayout>
+            
+            <!-- Search Suggestions -->
+            <View
+                style="@style/Separator"
+                android:background="@color/separator"
+                />
+
+            <ds.violin.v1.widget.IRecyclerView
+                android:id="@+id/lv_suggestions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

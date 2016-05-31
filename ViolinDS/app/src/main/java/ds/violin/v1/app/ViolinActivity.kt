@@ -38,6 +38,7 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
     override var activityActivated: Boolean = false
     override var transportData: Serializable? = NoTransportData
     override var activityResult: Any? = null
+    override var activityRequestCode:Int = ActivityViolin.TRANSPORT_ACTION_CODE
     override var activityResultCode: Int = Activity.RESULT_OK
     override var afterTransport: Boolean = false
     override var hasSceneTransition: Boolean = false
@@ -73,9 +74,9 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
         super<ActivityViolin>.onNewIntent(intent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super<AppCompatActivity>.onActivityResult(requestCode, resultCode, intent)
-        super<ActivityViolin>.onActivityResult(requestCode, resultCode, intent)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super<AppCompatActivity>.onActivityResult(requestCode, resultCode, data)
+        super<ActivityViolin>.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

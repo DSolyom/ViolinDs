@@ -92,7 +92,7 @@ interface JSONArrayModelListing : ModelListing<JSONArray, JSONObject>, HasSerial
 
     override val size: Int
         get() {
-            return models.length() ?: 0
+            return models.length()
         }
 
     override fun get(index: Int): JSONModel {

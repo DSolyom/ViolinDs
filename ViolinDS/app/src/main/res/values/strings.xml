@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">KotlinFramework</string>
+
+    <string name="search_no_voice_recognizer_available">No voice recognizer available on this device!</string>
 </resources>
