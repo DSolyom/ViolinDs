@@ -28,7 +28,7 @@ interface ContinuousListDataLoading : DataLoading {
 
 }
 
-interface ContinuousListing<LIST, MODEL_TYPE> : SelfLoadableModelListing<LIST, MODEL_TYPE> {
+interface ContinuousListing<LIST, MODEL_TYPE> : SelfLoadableListModeling<LIST, MODEL_TYPE> {
 
     /** should be at least 3 times higher than elements can be on screen at once - no checks! */
     var pageSize: Int
@@ -58,7 +58,7 @@ interface ContinuousListing<LIST, MODEL_TYPE> : SelfLoadableModelListing<LIST, M
         )
     }
 
-    open fun get(position: Int, completion: (entity: SelfLoadable, error: Throwable?) -> Unit): Modeling<MODEL_TYPE> {
+    open fun get(position: Int, completion: (entity: SelfLoadable, error: Throwable?) -> Unit): MODEL_TYPE? {
         when {
             position + 1 > size - pageSize / 3 -> loadNext(completion)
             position - 1 < pageSize / 3 -> loadPrevious(completion)
@@ -154,7 +154,7 @@ interface ContinuousMutableListing<L, T> : ContinuousListing<L, T> {
         var newParts: L
         try {
             newParts = when (result) {
-                is ModelListing<*, *> -> result.models as L
+                is ListModeling<*, *> -> result.models as L
                 else -> result as L
             }
         } catch(e: Throwable) {

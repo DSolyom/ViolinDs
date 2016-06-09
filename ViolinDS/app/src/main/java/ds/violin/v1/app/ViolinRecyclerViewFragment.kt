@@ -27,6 +27,8 @@ import java.util.*
 abstract class ViolinRecyclerViewFragment : ViolinFragment(), RecyclerViewViolin {
 
     override lateinit var recyclerView: IRecyclerView
+    override val emptyViewID: Int? = null
+    override var emptyView: View? = null
     override var layoutManagerState: Parcelable? = null
     override var adapter: AbsRecyclerViewAdapter? = null
     override var adapterViewBinder: RecyclerViewAdapterBinder? = null

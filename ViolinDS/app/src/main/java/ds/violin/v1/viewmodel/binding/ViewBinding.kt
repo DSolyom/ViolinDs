@@ -53,8 +53,6 @@ interface ViewBinding {
     companion object {
         val VIEW_NONE = -1
 
-        val DETECT = 0
-
         val TEXT = 1
         val TEXT_RESOURCE = 2
         val FROM_HTML = 3
@@ -81,23 +79,12 @@ interface ViewBinding {
 
         val CHECKBOX_CHECKED = 51
 
-        val FORMFIELD = 60
-        val FIELD_EDITTEXT = 61
         val ONKEY_LISTENER = 62
-
-        val FIELD_SPINNER = FORMFIELD
-        val FIELD_MULTICHOICESPINNER = FORMFIELD
-        val FIELD_RADIOBUTTON = FORMFIELD
-        val FIELD_RADIOGROUP = 70
-        val FIELD_CHECKBOX = 71
-        val FIELD_SLIDER = 72
 
         val ONCLICK_TRANSPORT = 100
 
         val ONCLICK_FORWARD = 102
         val ONCLICK_FORWARD_AND_CLEAR = 103
-        val ONCLICK_DIALOG = 104
-        val ONCLICK_DIALOG_CLOSE = 105
         val ONCLICK_RUNNABLE = 106
         val ONCLICK_GOBACK = 107
         val ONCLICK_GOBACKTO = 108
@@ -107,12 +94,8 @@ interface ViewBinding {
 
         val ONFOCUSCHANGE_LISTENER = 205
         val ONTOUCH_LISTENER = 206
-        val ONPOSITIONCHANGED_LISTENER = 207
         val ONSCROLL_LISTENER = 208
         val ONCHECKEDCHANGE_LISTENER = 209
-        val ONBUTTONSELECT_LISTENER = 210
-
-        val ONCLICK_SEARCH = 300
 
         val SELECTED_STATE = 500
         val TAG = 501
@@ -122,8 +105,6 @@ interface ViewBinding {
         val PADDING_RIGHT = 602
         val PADDING_BOTTOM = 603
         val PADDING_TOP = 604
-
-        val FIX_TILE_MODE = 10000
     }
 
     /**
@@ -257,8 +238,10 @@ interface ViewBinding {
 
                     if (value == null || (value is String && value.length == 0)) {
                         (view as ImageView).setImageResource(R.drawable.x_empty)
+                    } else if (value is String) {
+                        (view as LazyImageView).loadImage(ImageDescriptor(value))
                     } else {
-                        (view as LazyImageView).loadImage(ImageDescriptor(value as String))
+                        (view as LazyImageView).loadImage(value as ImageDescriptor)
                     }
                 }
 

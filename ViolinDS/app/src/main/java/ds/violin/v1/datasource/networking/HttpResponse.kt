@@ -17,8 +17,9 @@ limitations under the License.
 package ds.violin.v1.datasource.networking
 
 import ds.violin.v1.datasource.dataloading.Interruptable
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.JSONValue
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -92,8 +93,8 @@ open class ResponseToJSONReader : ResponseToTextReader() {
     override fun readResponse(responseStream: InputStream, charset: Charset): Any? {
         val jsonString = (super.readResponse(responseStream, charset) as String).trim()
         return when (jsonString.first()) {
-            '{' -> JSONObject(jsonString)
-            '[' -> JSONArray(jsonString)
+            '{' -> JSONValue.parse(jsonString) as JSONObject
+            '[' -> JSONValue.parse(jsonString) as JSONArray
             else -> null
         }
     }
@@ -104,8 +105,8 @@ open class ResponseToJSONReader : ResponseToTextReader() {
 
     override fun stringToResponse(input: String): Any? {
         return when (input.first()) {
-            '{' -> JSONObject(input)
-            '[' -> JSONArray(input)
+            '{' -> JSONValue.parse(input) as JSONObject
+            '[' -> JSONValue.parse(input) as JSONArray
             else -> null
         }
     }

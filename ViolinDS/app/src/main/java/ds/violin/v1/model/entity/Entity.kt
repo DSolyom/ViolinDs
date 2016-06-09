@@ -141,7 +141,7 @@ interface SelfLoadableModeling<MODEL> : Modeling<MODEL>, SelfLoadable {
     }
 }
 
-interface SelfLoadableModelListing<LIST, MODEL_TYPE> : ModelListing<LIST, MODEL_TYPE>, SelfLoadable {
+interface SelfLoadableListModeling<LIST, MODEL_TYPE> : ListModeling<LIST, MODEL_TYPE>, SelfLoadable {
 
     override var dataLoader: DataLoading
 
@@ -156,7 +156,7 @@ interface SelfLoadableModelListing<LIST, MODEL_TYPE> : ModelListing<LIST, MODEL_
 
         try {
             when (result) {
-                is ModelListing<*, *> -> enslave(result as ModelListing<LIST, MODEL_TYPE>)
+                is ListModeling<*, *> -> enslave(result as ListModeling<LIST, MODEL_TYPE>)
                 else -> models = result as LIST
             }
         } catch(e: Throwable) {

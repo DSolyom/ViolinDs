@@ -18,8 +18,8 @@ package ds.violin.v1.datasource.networking
 
 import ds.violin.v1.datasource.dataloading.Interruptable
 import ds.violin.v1.datasource.networking.HttpParams
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
 import java.io.PrintWriter
 import java.net.URLEncoder
 import java.nio.charset.Charset
@@ -136,10 +136,10 @@ private fun createKeyValueAndArrayString(params: Any?, charset: Charset, encodek
 private fun createParamsFromJSONObject(params: JSONObject, charset: Charset, encodekeyvalues: Boolean, sofar: String = "") : String {
     var result = ""
 
-    for (key in params.keys()) {
+    for (key in params.keys) {
         var param = params[key]
         result += createParamValueFrom(param, charset, encodekeyvalues, sofar,
-                additionFromKey(key, charset, encodekeyvalues, "" == sofar))
+                additionFromKey(key as String, charset, encodekeyvalues, "" == sofar))
     }
 
     return result
@@ -148,7 +148,7 @@ private fun createParamsFromJSONObject(params: JSONObject, charset: Charset, enc
 private fun createParamsFromJSONArray(params: JSONArray, charset: Charset, encodekeyvalues: Boolean, sofar: String = "") : String {
     var result = ""
 
-    for (i in 0..params.length()) {
+    for (i in 0..params.size) {
         var param = params[i]
         result += createParamValueFrom(param, charset, encodekeyvalues, sofar, "[]")
     }

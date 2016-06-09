@@ -24,8 +24,8 @@ import ds.violin.v1.datasource.networking.RTPKey
 import ds.violin.v1.model.JSONArrayEntity
 import ds.violin.v1.util.cache.Caching
 import ds.violin.v1.util.common.Debug
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
 import java.util.*
 
 class SQLiteNetworkCache : Caching<RTPKey, String> {
@@ -69,7 +69,8 @@ class SQLiteNetworkCache : Caching<RTPKey, String> {
             valuesJSON.put("target", key.target)
             valuesJSON.put("params", key.params)
             valuesJSON.put("value", value)
-            val json = JSONArray().put(valuesJSON)
+            val json = JSONArray()
+            json.add(valuesJSON)
 
             val writer = theDB.prepareWriter(Global.context, theCacheTable,
                     JSONArrayEntity(json))

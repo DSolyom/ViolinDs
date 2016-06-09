@@ -23,10 +23,12 @@ import ds.violin.v1.datasource.AbsBackgroundDataLoader
 import ds.violin.v1.model.entity.ContinuousListDataLoading
 import ds.violin.v1.model.entity.ContinuousMutableListing
 import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.model.modeling.JSONModel
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.util.common.Debug
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.JSONValue
 
 /**
  * Parcelable data for [ContinuousJSONArrayAdapter]
@@ -80,11 +82,11 @@ abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoa
     override var offsetChange: Int = 0
 
     /**
-     * to load the list continuously [get] should be called with a completion block which notify
-     * about range insertion or removal
+     * call 'get' with a completion block which notifies about range insertion or removal
+     * to load the list continuously
      */
     override fun getRowDataModel(dataPosition: Int): Modeling<*> {
-        return get(dataPosition, { entity, error ->
+        return JSONModel(get(dataPosition, { entity, error ->
             if (error == null) {
                 val newItemsAdded = sizeChange + offsetChange
                 if (newItemsAdded > 0) {
@@ -100,7 +102,7 @@ abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoa
             } else {
                 Debug.logException(error)
             }
-        })
+        })!!)
     }
 
     override fun dataToParcelable(): Parcelable {
@@ -108,7 +110,7 @@ abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoa
     }
 
     override fun createDataFrom(parcelableData: Parcelable) {
-        models = JSONArray((parcelableData as ContinuousJSONArrayAdapterDataParcelable).modelsString)
+        models = JSONValue.parse((parcelableData as ContinuousJSONArrayAdapterDataParcelable).modelsString) as JSONArray
         offset = parcelableData.offset
     }
 }

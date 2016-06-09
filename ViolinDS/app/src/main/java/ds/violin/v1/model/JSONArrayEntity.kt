@@ -17,19 +17,19 @@
 package ds.violin.v1.model
 
 import ds.violin.v1.model.entity.HasSerializableData
-import ds.violin.v1.model.entity.SelfLoadableModelListing
+import ds.violin.v1.model.entity.SelfLoadableListModeling
 import ds.violin.v1.datasource.dataloading.DataLoading
-import ds.violin.v1.model.modeling.JSONArrayModelList
-import ds.violin.v1.model.modeling.JSONArrayModelListing
-import org.json.JSONArray
-import org.json.JSONObject
+import ds.violin.v1.model.modeling.JSONArrayListModel
+import ds.violin.v1.model.modeling.JSONArrayListModeling
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
 import java.io.Serializable
 
 /**
  * list entity holding it's data in a [JSONArray]
  */
 open class JSONArrayEntity(models: JSONArray = JSONArray()) :
-        JSONArrayModelList(models), SelfLoadableModelListing<JSONArray, JSONObject> {
+        JSONArrayListModel(models), SelfLoadableListModeling<JSONArray, JSONObject> {
 
     override lateinit var dataLoader: DataLoading
     override var valid: Boolean = false

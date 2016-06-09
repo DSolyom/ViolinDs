@@ -37,10 +37,14 @@ interface RecyclerViewViolin {
         const val TAG_ENTITY_ADAPTER = "__recyclerviewviolin_adapter__"
     }
 
-    /** #Private - the recycler view's id */
+    /** #Protected - the recycler view's id */
     val recyclerViewID: Int
     /** lateinit - the recycler view - set in [onViewCreated] */
     var recyclerView: IRecyclerView
+    /** #Protected - the empty recycler view indicator view's id */
+    val emptyViewID: Int?
+    /** = null -  the empty recycler view indicator view - set in [onViewCreated] */
+    var emptyView: View?
     /** =null - when it is needed to restore state of [RecyclerView.LayoutManager] */
     var layoutManagerState: Parcelable?
     /** =null - set before [RecyclerViewViolin.play] */
@@ -59,6 +63,7 @@ interface RecyclerViewViolin {
      */
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         recyclerView = (this as PlayingViolin).findViewById(recyclerViewID) as IRecyclerView
+        emptyView = this.findViewById(emptyViewID ?: 0)
     }
 
     /**
@@ -66,21 +71,31 @@ interface RecyclerViewViolin {
      * this must be called before [LoadingViolin.play]
      */
     fun play() {
-        if (adapter is AbsHeaderedAdapter<*, *>) {
-            ensureListHeaderAndFooter()
-        }
-
-        if (adapter is SelfLoadable && this is LoadingViolin) {
-
-            /** register adapter for loading */
-            registerEntity(TAG_ENTITY_ADAPTER, adapter as SelfLoadable) { adapter, error ->
-                onAdapterLoadFinished(error)
+        if (!(this as PlayingViolin).played) {
+            if (adapter is AbsHeaderedAdapter<*, *>) {
+                ensureListHeaderAndFooter()
             }
-        } else {
 
-            /** just bind the adapter (via [onAdapterLoadFinished]) */
-            onAdapterLoadFinished(null)
+            if (recyclerView.adapter != adapter) {
+
+                // new adapter - set it for the recycler view
+                recyclerView.adapter = adapter
+            }
+
+            if (adapter is SelfLoadable && this is LoadingViolin && !(adapter as SelfLoadable).valid) {
+
+                /** register adapter for loading */
+                registerEntity(TAG_ENTITY_ADAPTER, adapter as SelfLoadable) { adapter, error ->
+                    onAdapterLoadFinished(error)
+                }
+            } else {
+
+                /** just bind the adapter (via [onAdapterLoadFinished]) */
+                onAdapterLoadFinished(null)
+            }
         }
+
+        toggleEmptyViewVisibility()
     }
 
     /**
@@ -190,6 +205,27 @@ interface RecyclerViewViolin {
     }
 
     /**
+     * toggle empty view's visibility
+     */
+    fun toggleEmptyViewVisibility() {
+        if (emptyView != null) {
+            emptyView!!.visibility = when (shouldShowEmpty()) {
+                true -> View.VISIBLE
+                false -> View.GONE
+            }
+        }
+    }
+
+    /**
+     * should show empty view
+     *
+     * @param return
+     */
+    fun shouldShowEmpty(): Boolean {
+        return (adapter !is SelfLoadable || (adapter as SelfLoadable).valid) && adapter!!.itemCount == 0
+    }
+
+    /**
      * get [recyclerView]'s last scroll (and all [RecyclerView.LayoutManager]) state
      */
     fun restoreInstanceState(savedInstanceState: Bundle) {
@@ -200,15 +236,21 @@ interface RecyclerViewViolin {
      * save[recyclerView]'s scroll (and all [RecyclerView.LayoutManager]) state
      */
     fun saveInstanceState(outState: Bundle) {
-        outState.putParcelable(TAG_LM_STATE, recyclerView.getState())
+
+        try {
+            outState.putParcelable(TAG_LM_STATE, recyclerView.getState())
+        } catch(e: Throwable) {
+            // recyclerView's existence is not ensured yet
+        }
     }
 }
 
 /**
  * base interface for binding [AbsRecyclerViewAdapter] to the [IRecyclerView]
  *
- * !note: if you want to show when the list is empty or show/hide loading do that in the
- *        [IRecyclerView.headerView] or [IRecyclerView.footerView]
+ * !note: one binder is only usable for one [RecyclerView], if the layout is recreated
+ *        (like after a fragment transformation) a new [RecyclerViewAdapterBinder] is required
+ *        (@see [PlayingViolin.played] and @see [FragmentViolin.onCreateView]
  */
 open class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) : ModelViewBinding<AbsRecyclerViewAdapter> {
 
@@ -219,6 +261,7 @@ open class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) 
 
     override fun bind(adapter: AbsRecyclerViewAdapter) {
 
+        /** set adapter */
         val recyclerView = rootView as RecyclerView
 
         if (recyclerView.layoutManager == null) {
@@ -227,12 +270,17 @@ open class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) 
 
         if (recyclerView.adapter != adapter) {
 
-            // new adapter loaded - set it for the list
+            // new adapter loaded - set it for the recycler view
             recyclerView.adapter = adapter
         } else {
 
             // 'only' data set has changed
             adapter.notifyDataSetChanged()
+        }
+
+        /** show / hide [emptyView] */
+        if (on is RecyclerViewViolin) {
+            (on as RecyclerViewViolin).toggleEmptyViewVisibility()
         }
     }
 }

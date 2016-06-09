@@ -34,6 +34,7 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
     override var rootView: View? = null
     override var rootViewId: Int? = null
     override var parentViolin: PlayingViolin? = null
+    override var played: Boolean = false
     override var violinActivity: ActivityViolin = this
     override var activityActivated: Boolean = false
     override var transportData: Serializable? = NoTransportData
@@ -53,6 +54,12 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
 
     override fun play() {
         // do your magic here
+
+        super.play()
+    }
+
+    override fun findViewById(layoutResID: Int): View? {
+        return super<AppCompatActivity>.findViewById(layoutResID)
     }
 
     override fun restoreInstanceState(savedInstanceState: Bundle) {

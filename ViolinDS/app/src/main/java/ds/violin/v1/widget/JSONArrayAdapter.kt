@@ -23,12 +23,15 @@ import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.datasource.dataloading.DataLoading
 import ds.violin.v1.model.entity.SelfLoadable
-import ds.violin.v1.model.entity.SelfLoadableModelListing
-import ds.violin.v1.model.modeling.JSONArrayModelListing
+import ds.violin.v1.model.entity.SelfLoadableListModeling
+import ds.violin.v1.model.modeling.JSONArrayListModeling
+import ds.violin.v1.model.modeling.JSONModel
+import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
 import ds.violin.v1.widget.adapter.SectionInfo
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.JSONValue
 import java.io.Serializable
 import java.util.*
 
@@ -72,25 +75,28 @@ class JSONArrayAdapterDataParcelable(modelsString: String,
 }
 
 /**
- * abstract class for the most basic [AbsHeaderedAdapter] with data held in the form of a [JSONArrayModelListing]
+ * abstract class for the most basic [AbsHeaderedAdapter] with data held in the form of a [JSONArrayListModeling]
  *
  * this type of adapter can be used for [IRecyclerView]s when the data is already present
  */
 abstract class JSONArrayAdapter(on: PlayingViolin, models: JSONArray = JSONArray()) :
-        AbsHeaderedAdapter<JSONArray, JSONObject>(on), JSONArrayModelListing {
+        AbsHeaderedAdapter<JSONArray, JSONObject>(on), JSONArrayListModeling {
 
     override var models: JSONArray = models
 
+    override fun getRowDataModel(dataPosition: Int): Modeling<*> {
+        return JSONModel(get(dataPosition))
+    }
 }
 
 /**
  * abstract class for the most basic [AbsHeaderedAdapter] with data held in the form of a
- * [JSONArrayModelListing]
+ * [JSONArrayListModeling]
  *
  * this type of adapter can be used for [IRecyclerView]s when the data requires loading
  */
 abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
-        JSONArrayAdapter(on, models), SelfLoadableModelListing<JSONArray, JSONObject>, HasParcelableData {
+        JSONArrayAdapter(on, models), SelfLoadableListModeling<JSONArray, JSONObject>, HasParcelableData {
 
     override var interrupted: Boolean = false
     override var valid: Boolean = false
@@ -102,7 +108,7 @@ abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading
     }
 
     override fun createDataFrom(parcelableData: Parcelable) {
-        models = JSONArray((parcelableData as JSONArrayAdapterDataParcelable).modelsString)
+        models = JSONValue.parse((parcelableData as JSONArrayAdapterDataParcelable).modelsString) as JSONArray
         sections = parcelableData.sections
         sectionList = parcelableData.sectionList
     }

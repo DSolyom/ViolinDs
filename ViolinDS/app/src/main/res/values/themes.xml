@@ -15,6 +15,7 @@
         <item name="android:actionBarStyle">@style/Theme.App.ActionBar</item>
         <item name="android:actionMenuTextColor">@color/actionbar_text</item>
         <item name="android:actionBarWidgetTheme">@style/Theme.App.ActionBar.Widget</item>
+        <item name="android:textColorPrimary">@color/actionbar_title</item>
     </style>
 
     <style name="Theme.App.Popup" parent="Theme.AppCompat.Light.NoActionBar">
@@ -28,6 +29,12 @@
         <item name="android:background">@color/actionbar_bg</item>
         <item name="android:titleTextStyle">@style/Theme.App.ActionBarTitle</item>
         <item name="android:subtitleTextStyle">@style/Theme.App.ActionBarSubtitle</item>
+
+        <!-- AppCompat Toolbar Up/Home button tint -->
+        <item name="colorControlNormal">@color/actionbar_title</item>
+        <!-- AppCompat Toolbar title color @#%! -->
+        <item name="android:textColorPrimary">@color/actionbar_title</item>
+
     </style>
 
     <style name="Theme.App.ActionBar.Widget" parent="Theme.Base">
@@ -43,7 +50,7 @@
     </style>
 
     <style name="Theme.App.ActionBarTitle" parent="Theme.Base.ActionBarTitle">
-        <item name="android:textColor">@color/actionbar_text</item>
+        <item name="android:textColor">@color/actionbar_title</item>
     </style>
 
     <style name="Theme.Base.ActionBarSubtitle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle">

@@ -25,7 +25,6 @@ import android.database.sqlite.SQLiteStatement
 import ds.violin.v1.model.modeling.IterableModeling
 import ds.violin.v1.datasource.base.*
 import ds.violin.v1.util.common.Debug
-import org.json.JSONObject
 import java.util.*
 
 data class SQLiteQueryParams(var distinct: Boolean = true,
@@ -299,7 +298,7 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
                 type = columns[i]!!.type
                 value = model.get(columnName)
 
-                if ((value == null && model.has(columnName) || value == JSONObject.NULL || method == Method.OVERWRITE)
+                if ((value == null && model.has(columnName) || method == Method.OVERWRITE)
                         && (type and Column.NULL) > 0) {
                     insertStatement!!.bindNull(i + 1);
                     if (updateStatement != null) {

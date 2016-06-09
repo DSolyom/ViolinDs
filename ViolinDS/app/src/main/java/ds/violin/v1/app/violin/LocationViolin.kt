@@ -18,10 +18,13 @@ package ds.violin.v1.app.violin
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.location.*
 import ds.violin.v1.Global
@@ -59,6 +62,8 @@ interface LocationViolin : LocationListener {
     var locationCheckEnabled: Boolean
     /** = false, #Private */
     var checkedLocationSettings: Boolean
+    /** = false, #Private */
+    var locationRequestsStarted: Boolean
     /** = true, #Private */
     var locationDisabledNotified: Boolean
 
@@ -113,7 +118,7 @@ interface LocationViolin : LocationListener {
                 addLocationRequests()
             }
             if (!locationRequests.isEmpty()) {
-                checkLocationSettings()
+                startLocationRequests()
             }
         } else {
             stopLocationRequests()
@@ -124,7 +129,13 @@ interface LocationViolin : LocationListener {
         locationRequests.add(createDefaultLocationRequest())
     }
 
+    /**
+     * check if getting location is enabled on the device - start resolution when required
+     */
     fun checkLocationSettings() {
+        if (checkedLocationSettings) {
+            return
+        }
         val locationSettingsRequest = LocationSettingsRequest.Builder()
                 .addAllLocationRequests(locationRequests)
                 .build()
@@ -174,35 +185,67 @@ interface LocationViolin : LocationListener {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, result: Any?) {
         if (requestCode == CHECK_SETTINGS_CODE) {
-            checkLocationSettings()
+
+            // need to check manually if location settings are now enabled because resultCode could always be 0 on some devices
+            var lm = ((this as PlayingViolin).violinActivity as Context).getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            var good = false
+            for (permission in requiredUserPermissions) {
+                good = good or when (permission) {
+                    Manifest.permission.ACCESS_COARSE_LOCATION -> lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                    Manifest.permission.ACCESS_FINE_LOCATION -> lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                    else -> false
+                }
+                if (good) {
+                    startLocationRequests()
+                    break
+                }
+            }
+            if (!good) {
+                onLocationSettingsDisabled()
+            }
         }
     }
 
     fun startLocationRequests() {
         try {
-            for (request in locationRequests) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(
-                        (this as GoogleApiViolin).googleApiClient, request, this)
+            if (!locationRequestsStarted) {
+                for (request in locationRequests) {
+                    LocationServices.FusedLocationApi.requestLocationUpdates(
+                            (this as GoogleApiViolin).googleApiClient, request, this)
+                }
+                locationRequestsStarted = true
+                checkLocationSettings()
             }
         } catch(e: SecurityException) {
-            (this as PlayingViolin).
-                    askUserForPermission(ASK_PERMISSION_LOCATION,
-                            requiredUserPermissions) { permissions, grantResults ->
-                        val success = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        if (success) {
-                            startLocationRequests()
-                        } else {
-                            onLocationSettingsDisabled()
+            if (!checkedLocationSettings) {
+                (this as PlayingViolin).
+                        askUserForPermission(ASK_PERMISSION_LOCATION,
+                                requiredUserPermissions) { permissions, grantResults ->
+                            val success = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            if (success) {
+                                startLocationRequests()
+                            } else {
+                                onLocationSettingsDisabled()
+                            }
                         }
-                    }
+            }
         }
     }
 
     fun stopLocationRequests() {
+        locationRequestsStarted = false
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 (this as GoogleApiViolin).googleApiClient, this)
     }
 
+    /**
+     * override to act when location settings are still disabled or permissions are still not given after asking for them
+     *
+     * if location's are not required you can set [checkedLocationSettings] to true and call [saveCheckedLocationSettings]
+     * not to check for permission again
+     *
+     * !note: always call this (super) to set [locationDisabledNotified]
+     */
     fun onLocationSettingsDisabled() {
         locationDisabledNotified = true
         Debug.logD("LocationViolin", "Location settings disabled")

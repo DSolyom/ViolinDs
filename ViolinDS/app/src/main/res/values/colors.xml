@@ -14,12 +14,15 @@
 
     <color name="actionbar_bg">@color/primary</color>
     <color name="actionbar_text">@color/text_inverse</color>
-    <color name="actionbar_title">#33b5e5</color>
+    <color name="actionbar_title">@color/actionbar_text</color>
     <color name="actionbar_dialog_bg">@color/actionbar_bg</color>
     <color name="actionbar_dialog_title">#33b5e5</color>
     <color name="actionbar_search_bg">#FFFFFF</color>
-    <color name="actionbar_search_text">#070707</color>
-    <color name="actionbar_search_hint">#60070707</color>
+    <color name="actionbar_search_text">#333333</color>
+    <color name="actionbar_search_hint">#60333333</color>
+    <color name="actionbar_search_close_tint">#90FFFFFF</color>
+    <color name="actionbar_search_icon_tint">#50FFFFFF</color>
+    <color name="actionbar_search_separator">#E0E0E0</color>
     <color name="actionbar_separator">#6633b5e5</color>
     <color name="actionbar_title_separator">#33b5e5</color>
     <color name="actionbar_item_bg_active">#6633b5e5</color>

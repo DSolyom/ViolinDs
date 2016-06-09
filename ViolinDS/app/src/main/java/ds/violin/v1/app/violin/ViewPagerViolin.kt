@@ -62,19 +62,21 @@ interface ViewPagerViolin {
      * this must be called before [LoadingViolin.play]
      */
     fun play() {
-        if (adapterViewBinder == null) {
-            adapterViewBinder = BasicViewPagerBinder()
-        }
-        if (adapter is SelfLoadable && this is LoadingViolin) {
-
-            /** register adapter for loading */
-            registerEntity(RecyclerViewViolin.TAG_ENTITY_ADAPTER, adapter as SelfLoadable) { adapter, error ->
-                onAdapterLoadFinished(error)
+        if (!(this as PlayingViolin).played) {
+            if (adapterViewBinder == null) {
+                adapterViewBinder = BasicViewPagerBinder()
             }
-        } else {
+            if (adapter is SelfLoadable && this is LoadingViolin) {
 
-            /** just bind the adapter (via [onAdapterLoadFinished]) */
-            onAdapterLoadFinished(null)
+                /** register adapter for loading */
+                registerEntity(RecyclerViewViolin.TAG_ENTITY_ADAPTER, adapter as SelfLoadable) { adapter, error ->
+                    onAdapterLoadFinished(error)
+                }
+            } else {
+
+                /** just bind the adapter (via [onAdapterLoadFinished]) */
+                onAdapterLoadFinished(null)
+            }
         }
     }
 
@@ -98,11 +100,15 @@ interface ViewPagerViolin {
      * get [viewPager]'s last selected page
      */
     fun restoreInstanceState(savedInstanceState: Bundle) {
-        currentPage = savedInstanceState.getSerializable(TAG_VP_STATE) as Int
+        try {
+            currentPage = savedInstanceState.getSerializable(TAG_VP_STATE) as Int
+        } catch(e: Throwable) {
+            ;
+        }
     }
 
     /**
-     * save[viewPager]'s current page
+     * save [viewPager]'s current page
      */
     fun saveInstanceState(outState: Bundle) {
         outState.putSerializable(TAG_VP_STATE, currentPage)
@@ -125,6 +131,12 @@ open class BasicViewPagerBinder : ModelViewBinding<PagerAdapter> {
             viewPager.adapter = adapter
 
             (on as ViewPagerViolin).tabLayout?.setupWithViewPager(viewPager)
+            viewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+
+                override fun onPageSelected(position: Int) {
+                    (on as ViewPagerViolin).currentPage = position
+                }
+            })
         } else {
             adapter.notifyDataSetChanged()
         }

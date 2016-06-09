@@ -17,16 +17,16 @@
 package ds.violin.v1.model
 
 import android.database.Cursor
-import ds.violin.v1.model.entity.SelfLoadableModelListing
+import ds.violin.v1.model.entity.SelfLoadableListModeling
 import ds.violin.v1.model.modeling.CursorModel
-import ds.violin.v1.model.modeling.CursorModelListing
+import ds.violin.v1.model.modeling.CursorListModeling
 import ds.violin.v1.datasource.dataloading.DataLoading
 
 /**
  * list entity holding it's data in a [Cursor]
  */
 open class CursorListEntity(cursor: Cursor? = null) :
-        CursorModelListing, SelfLoadableModelListing<CursorModel, Cursor> {
+        CursorListModeling, SelfLoadableListModeling<CursorModel, Cursor> {
 
     override var models: CursorModel = CursorModel(cursor)
         set(value) {

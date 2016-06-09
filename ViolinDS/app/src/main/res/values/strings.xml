@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">KotlinFramework</string>
 
-    <string name="search_no_voice_recognizer_available">No voice recognizer available on this device!</string>
+    <string name="speak_now">Speak now!</string>
+
+    <string name="nothing_to_discover">Nothing to discovery :S</string>
+
+    <string name="search_error_no_voice_recognizer_available">No voice recognizer available on this device!</string>
+    <string name="search_error_no_match">Sry, no match!</string>
+    <string name="search_error">Voice recognizer not available at this time!</string>
 </resources>

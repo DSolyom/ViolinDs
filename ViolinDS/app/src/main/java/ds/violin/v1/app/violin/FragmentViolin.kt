@@ -50,6 +50,9 @@ interface FragmentViolin : PlayingViolin {
             restoreInstanceState(savedInstanceState)
         }
 
+        /** set played flag to false because everything should be redisplayed */
+        played = false
+
         return when {
             rootView != null -> null
             layoutResID != null -> {
@@ -108,6 +111,7 @@ interface FragmentViolin : PlayingViolin {
     fun onDetach() {
         if (parentViolin != null) {
             parentViolin!!.onViolinDetached(this)
+            parentViolin = null
         }
     }
 

@@ -18,17 +18,18 @@ package ds.violin.v1.model.modeling
 
 import android.database.Cursor
 import ds.violin.v1.model.entity.HasSerializableData
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.JSONValue
 import java.io.Serializable
 
-interface ModelListing<LIST, MODEL> {
+interface ListModeling<LIST, MODEL> {
 
-    /** #ProtectedSet - the models - !note: the actual reference may change (@see [JSONArrayModelListing.addAll]) */
+    /** #ProtectedSet - the models - !note: the actual reference may change (@see [JSONArrayListModeling.addAll]) */
     var models: LIST
     val size: Int
 
-    fun get(index: Int): Modeling<MODEL>
+    fun get(index: Int): MODEL?
 
     fun add(index: Int, value: MODEL)
     fun add(index: Int, value: Modeling<MODEL>)
@@ -44,7 +45,7 @@ interface ModelListing<LIST, MODEL> {
     }
 
     /** your models are now my models too */
-    fun enslave(other: ModelListing<LIST, MODEL>) {
+    fun enslave(other: ListModeling<LIST, MODEL>) {
         models = other.models
     }
 
@@ -52,11 +53,11 @@ interface ModelListing<LIST, MODEL> {
     fun clear()
 }
 
-interface MutableListModelListing<MODEL> : ModelListing<MutableList<MODEL>, MODEL> {
+interface MutableListModeling<MODEL> : ListModeling<MutableList<MODEL>, MODEL> {
 
     override val size: Int
         get() {
-            return models.size ?: 0
+            return models.size
         }
 
     override fun add(index: Int, value: MODEL) {
@@ -88,23 +89,27 @@ interface MutableListModelListing<MODEL> : ModelListing<MutableList<MODEL>, MODE
 
 }
 
-interface JSONArrayModelListing : ModelListing<JSONArray, JSONObject>, HasSerializableData {
+interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerializableData {
 
     override val size: Int
         get() {
-            return models.length()
+            return models.size
         }
 
-    override fun get(index: Int): JSONModel {
-        return JSONModel(models.getJSONObject(index))
+    override fun get(index: Int): JSONObject {
+        return models[index] as JSONObject
     }
 
     override fun add(index: Int, value: JSONObject) {
-        addAll(index, JSONArray().put(value))
+        val jsonArray = JSONArray()
+        jsonArray.add(value)
+        addAll(index, jsonArray)
     }
 
     override fun add(index: Int, value: Modeling<JSONObject>) {
-        addAll(index, JSONArray().put(value.values))
+        val jsonArray = JSONArray()
+        jsonArray.add(value.values)
+        addAll(index, jsonArray)
     }
 
     override fun remove(index: Int, count: Int) {
@@ -122,30 +127,30 @@ interface JSONArrayModelListing : ModelListing<JSONArray, JSONObject>, HasSerial
 
         // screw JSONArray for not having option to put at start of list or merge not to say
         // put other JSONArray in the middle
-        if (index == models.length()) {
-            for (i in 0..otherModels.length() - 1) {
-                models.put(otherModels.get(i))
+        if (index == models.size) {
+            for (model in otherModels) {
+                models.add(model)
             }
         } else if (index == 0) {
             val oldModels = models
             models = JSONArray()
-            for (i in 0..otherModels.length() - 1) {
-                models.put(otherModels.get(i))
+            for (model in otherModels) {
+                models.add(model)
             }
-            for (i in 0..oldModels.length() - 1) {
-                models.put(oldModels.get(i))
+            for (model in oldModels) {
+                models.add(model)
             }
         } else {
             val oldModels = models
             models = JSONArray()
             for (i in 0..index - 1) {
-                models.put(oldModels.get(i))
+                models.add(oldModels[i])
             }
-            for (i in 0..otherModels.length() - 1) {
-                models.put(otherModels.get(i))
+            for (i in 0..otherModels.size - 1) {
+                models.add(otherModels[i])
             }
-            for (i in index..oldModels.length() - 1) {
-                models.put(oldModels.get(i))
+            for (i in index..oldModels.size - 1) {
+                models.add(oldModels[i])
             }
         }
     }
@@ -159,11 +164,11 @@ interface JSONArrayModelListing : ModelListing<JSONArray, JSONObject>, HasSerial
     }
 
     override fun createDataFrom(serializedData: Serializable) {
-        models = JSONArray(serializedData as String)
+        models = JSONValue.parse(serializedData as String) as JSONArray
     }
 }
 
-interface CursorModelListing : ModelListing<CursorModel, Cursor> {
+interface CursorListModeling : ListModeling<CursorModel, Cursor> {
 
     override val size: Int
         get() {
@@ -175,9 +180,9 @@ interface CursorModelListing : ModelListing<CursorModel, Cursor> {
      *
      *  @return
      */
-    override fun get(index: Int): CursorModel {
+    override fun get(index: Int): Cursor? {
         models._cursorPosition = index
-        return models
+        return models.values
     }
 
     override fun add(index: Int, value: Cursor) {
@@ -202,9 +207,9 @@ interface CursorModelListing : ModelListing<CursorModel, Cursor> {
 }
 
 /**
- * [JSONArrayModelListing] used in [JSONArrayEntity]
+ * [JSONArrayListModeling] used in [JSONArrayEntity]
  */
-open class JSONArrayModelList(models: JSONArray = JSONArray()) : JSONArrayModelListing {
+open class JSONArrayListModel(models: JSONArray = JSONArray()) : JSONArrayListModeling {
 
     override var models: JSONArray = models
 }

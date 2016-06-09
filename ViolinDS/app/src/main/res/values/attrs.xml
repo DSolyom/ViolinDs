@@ -1,59 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="LazyLoadingImageView">
+    <declare-styleable name="LazyImageView">
 
-        <attr name="android:scaleType" />
+        <attr name="android:scaleType"/>
 
-        <attr name="alwaysLoadInBackground" format="boolean" />
+        <attr name="alwaysLoadInBackground" format="boolean"/>
 
-        <attr name="shouldScaleImageSize" format="boolean" />
+        <attr name="shouldScaleImageSize" format="boolean"/>
 
-        <attr name="isAnimated" format="boolean" />
+        <attr name="isAnimated" format="boolean"/>
 
-        <attr name="defaultImage" format="reference" />
-        <attr name="defaultIsAnimated" format="boolean" />
+        <attr name="defaultImage" format="reference"/>
+        <attr name="defaultIsAnimated" format="boolean"/>
         <attr name="defaultScaleType" format="enum">
-            <enum name="matrix" value="0" />
-            <enum name="fitXY" value="1" />
-            <enum name="fitStart" value="2" />
-            <enum name="fitCenter" value="3" />
-            <enum name="fitEnd" value="4" />
-            <enum name="center" value="5" />
-            <enum name="centerCrop" value="6" />
-            <enum name="centerInside" value="7" />
+            <enum name="matrix" value="0"/>
+            <enum name="fitXY" value="1"/>
+            <enum name="fitStart" value="2"/>
+            <enum name="fitCenter" value="3"/>
+            <enum name="fitEnd" value="4"/>
+            <enum name="center" value="5"/>
+            <enum name="centerCrop" value="6"/>
+            <enum name="centerInside" value="7"/>
         </attr>
 
-        <attr name="loadingImage" format="reference" />
-        <attr name="loadingIsAnimated" format="boolean" />
+        <attr name="loadingImage" format="reference"/>
+        <attr name="loadingIsAnimated" format="boolean"/>
         <attr name="loadingScaleType" format="enum">
-            <enum name="matrix" value="0" />
-            <enum name="fitXY" value="1" />
-            <enum name="fitStart" value="2" />
-            <enum name="fitCenter" value="3" />
-            <enum name="fitEnd" value="4" />
-            <enum name="center" value="5" />
-            <enum name="centerCrop" value="6" />
-            <enum name="centerInside" value="7" />
+            <enum name="matrix" value="0"/>
+            <enum name="fitXY" value="1"/>
+            <enum name="fitStart" value="2"/>
+            <enum name="fitCenter" value="3"/>
+            <enum name="fitEnd" value="4"/>
+            <enum name="center" value="5"/>
+            <enum name="centerCrop" value="6"/>
+            <enum name="centerInside" value="7"/>
         </attr>
 
-        <attr name="errorImage" format="reference" />
-        <attr name="errorIsAnimated" format="boolean" />
+        <attr name="errorImage" format="reference"/>
+        <attr name="errorIsAnimated" format="boolean"/>
         <attr name="errorScaleType" format="enum">
-            <enum name="matrix" value="0" />
-            <enum name="fitXY" value="1" />
-            <enum name="fitStart" value="2" />
-            <enum name="fitCenter" value="3" />
-            <enum name="fitEnd" value="4" />
-            <enum name="center" value="5" />
-            <enum name="centerCrop" value="6" />
-            <enum name="centerInside" value="7" />
+            <enum name="matrix" value="0"/>
+            <enum name="fitXY" value="1"/>
+            <enum name="fitStart" value="2"/>
+            <enum name="fitCenter" value="3"/>
+            <enum name="fitEnd" value="4"/>
+            <enum name="center" value="5"/>
+            <enum name="centerCrop" value="6"/>
+            <enum name="centerInside" value="7"/>
         </attr>
 
-        <attr name="setBitmapAnimation" format="reference" />
+        <attr name="setBitmapAnimation" format="reference"/>
 
+        <attr name="cornerRadius" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="LazyImageFlipAnimationLayout">
-        <attr name="flipFirst" format="boolean" />
+        <attr name="flipFirst" format="boolean"/>
     </declare-styleable>
 </resources>

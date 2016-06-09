@@ -19,14 +19,15 @@ package ds.violin.v1.model.modeling
 import android.database.Cursor
 import ds.violin.v1.datasource.sqlite.*
 import ds.violin.v1.model.entity.HasSerializableData
-import org.json.JSONObject
+import org.json.simple.JSONObject
+import org.json.simple.JSONValue
 import java.io.Serializable
 import java.util.*
 
 interface GetSetModeling {
 
     fun has(key: String): Boolean
-    fun get(key: String): Any?
+    operator fun get(key: String): Any?
     fun put(key: String, value: Any?)
 
     fun remove(key: String) {
@@ -40,7 +41,7 @@ interface Modeling<T> : GetSetModeling {
 
 }
 
-interface IterableModeling<T> : Modeling<T>, Iterable<String> {
+interface IterableModeling<T> : Modeling<T>, Iterable<Any?> {
 
 }
 
@@ -66,7 +67,7 @@ interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>> {
         values!!.clear()
     }
 
-    override operator fun iterator(): Iterator<String> {
+    override operator fun iterator(): Iterator<Any?> {
         return values!!.keys.iterator()
     }
 }
@@ -74,7 +75,7 @@ interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>> {
 interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData {
 
     override fun get(key: String): Any? {
-        return values!!.opt(key)
+        return values!![key]
     }
 
     override fun put(key: String, value: Any?) {
@@ -82,15 +83,15 @@ interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData {
     }
 
     override fun has(key: String): Boolean {
-        return values?.has(key) ?: false
+        return values?.contains(key) ?: false
     }
 
     fun clear() {
         values = JSONObject()
     }
 
-    override operator fun iterator(): Iterator<String> {
-        return values!!.keys()
+    override operator fun iterator(): Iterator<Any?> {
+        return values!!.keys.iterator()
     }
 
     override fun dataToSerializable(): Serializable {
@@ -98,7 +99,7 @@ interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData {
     }
 
     override fun createDataFrom(serializedData: Serializable) {
-        values = JSONObject(serializedData as String)
+        values = JSONValue.parse(serializedData as String) as JSONObject
     }
 }
 
@@ -141,7 +142,7 @@ interface CursorModeling : Modeling<Cursor> {
 }
 
 /**
- * [JSONModeling] used in JSONEntity and [JSONArrayModelListing]
+ * [JSONModeling] used in JSONEntity and [JSONArrayListModeling]
  */
 open class JSONModel(values: JSONObject = JSONObject()) : JSONModeling {
 
@@ -182,7 +183,7 @@ open class SerializableMapModel(values: MutableMap<String, Serializable> = HashM
 }
 
 /**
- * [CursorModeling] used in [CursorEntity] and [CursorModelListing]
+ * [CursorModeling] used in [CursorEntity] and [CursorListModeling]
  */
 open class CursorModel(values: Cursor? = null, cursorPosition: Int = 0) : CursorModeling {
 

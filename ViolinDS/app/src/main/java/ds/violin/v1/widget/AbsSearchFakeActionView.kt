@@ -16,22 +16,39 @@
 
 package ds.violin.v1.widget
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
+import android.os.Build
+import android.os.Bundle
 import android.speech.RecognizerIntent
+import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.view.View
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.EditText
-import ds.violin.v1.R
+import ds.violin.v1.Global
 import ds.violin.v1.app.ViolinRecyclerViewFragment
 import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.modeling.Modeling
+import ds.violin.v1.R
+import ds.violin.v1.app.ViolinActivity
+import ds.violin.v1.util.common.Debug
 import ds.violin.v1.viewmodel.AbsModelViewBinder
 import ds.violin.v1.viewmodel.binding.ViewBinding
 
-abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment() {
+/**
+ * [AbsSearchFakeActionView] is a mimic of the ToolBar's search action view behavior
+ * it is a FragmentDialog which appears above the ToolBar, animating out ( Api >= LOLLIPOP )
+ */
+abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScreenDialog {
 
     companion object {
         const val VOICE_INPUT_CODE = 2293
@@ -41,31 +58,37 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment() {
     override val layoutResID: Int? = R.layout.search_fake_action_view
 
     lateinit var searchEditText: EditText
+    lateinit var fakeAVCardView: View
+    lateinit var separatorView: View
 
     var playBinder: AbsModelViewBinder? = null
+    var closing = false
 
-    init {
-        showsDialog = true
+    val searchRunnable = Runnable { startSearch() }
+    val searchDelay = 500L
 
-        setStyle(STYLE_NO_FRAME and STYLE_NO_TITLE, R.style.Theme_Transparent)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super<FullScreenDialog>.onCreate(savedInstanceState)
+        super<ViolinRecyclerViewFragment>.onCreate(savedInstanceState)
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return super<FullScreenDialog>.onCreateDialog(savedInstanceState)
     }
 
     override fun onStart() {
-        super.onStart()
-
-        val width = ViewGroup.LayoutParams.MATCH_PARENT
-        val height = ViewGroup.LayoutParams.MATCH_PARENT
-        dialog.window.setLayout(width, height)
+        super<ViolinRecyclerViewFragment>.onStart()
+        super<FullScreenDialog>.onStart()
     }
 
     override fun play() {
 
         /** create your [adapter] and [adapterViewBinder] before calling super */
 
-        super.play()
-
-        if (playBinder == null) {
+        if (!played) {
             searchEditText = findViewById(R.id.et_search) as EditText
+            fakeAVCardView = findViewById(R.id.cv_fake_action_view)!!
+            separatorView = findViewById(R.id.separator)!!
 
             playBinder = createPlayBinder()
             playBinder!!.bind(null)
@@ -73,27 +96,33 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment() {
             openDialog()
         }
 
+        super.play()
     }
 
     open fun createPlayBinder(): AbsModelViewBinder {
         return PlayBinder(this, rootView!!)
     }
 
+    /**
+     * start activity with intent for voice input
+     */
     fun startVoiceInput() {
         try {
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak the word");
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, R.string.speak_now)
             startActivityForResult(intent, VOICE_INPUT_CODE)
         } catch(e: Throwable) {
-            ds.violin.v1.util.common.toastMessage(violinActivity as Context, R.string.search_no_voice_recognizer_available)
+            ds.violin.v1.util.common.toastMessage(violinActivity as Context, R.string.search_error_no_voice_recognizer_available)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, result: Any?) {
         if (requestCode == VOICE_INPUT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
+
+                /** got result from voice input */
                 val textMatchList = (result as Intent)
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
 
@@ -101,26 +130,149 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment() {
                     val query = textMatchList[0]
                     searchEditText.append(query)
                 }
-                // Result code for various error.
-            } else if (resultCode == RecognizerIntent.RESULT_NETWORK_ERROR) {
-                // TODO: errors
             } else if (resultCode == RecognizerIntent.RESULT_NO_MATCH) {
-                // TODO: errors
-            } else if (resultCode == RecognizerIntent.RESULT_SERVER_ERROR) {
-                // TODO: errors
+
+                /** voice input failed to recognice anything */
+                ds.violin.v1.util.common.toastMessage(violinActivity as Context, R.string.search_error_no_match)
+            } else  {
+
+                /** other errors */
+                ds.violin.v1.util.common.toastMessage(violinActivity as Context, R.string.search_error)
             }
         }
         super.onActivityResult(requestCode, resultCode, result)
     }
 
-    open protected fun closeDialog() {
-        dismissAllowingStateLoss()
+    /**
+     * close dialog - animating when Api >= LOLLIPOP
+     */
+    override fun closeDialog() {
+        if (closing) {
+            return
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val anim = ViewAnimationUtils.createCircularReveal(
+                    fakeAVCardView,
+                    (fakeAVCardView.measuredWidth - Global.dipMultiplier * 16).toInt(),
+                    fakeAVCardView.measuredHeight / 2,
+                    fakeAVCardView.measuredWidth - Global.dipMultiplier * 16,
+                    0f
+            )
+            anim.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    dismissAllowingStateLoss()
+                    closing = false
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                    dismissAllowingStateLoss()
+                    closing = false
+                }
+
+                override fun onAnimationStart(animation: Animator?) {
+                    closing = true
+                }
+
+            })
+            anim.start()
+
+            val dialogBackgroundColors = arrayOf(
+                    ColorDrawable(ContextCompat.getColor(violinActivity as Context, R.color.dialog_transparent)),
+                    ColorDrawable(ContextCompat.getColor(violinActivity as Context, android.R.color.transparent))
+            )
+            val dialogBackgroundTransition = TransitionDrawable(dialogBackgroundColors)
+            rootView!!.background = dialogBackgroundTransition
+            dialogBackgroundTransition.startTransition(anim.duration.toInt())
+
+            val appBar = (violinActivity as ViolinActivity).appBar
+            if (appBar != null) {
+                val appBarAlphaAnimation = ObjectAnimator.ofFloat(appBar, View.ALPHA, 0f, 1f)
+                appBarAlphaAnimation.duration = anim.duration
+                appBarAlphaAnimation.start()
+            }
+            val appBarShadow = (violinActivity as ViolinActivity).appBarShadow
+            if (appBarShadow != null) {
+                val appBarShadowAlphaAnimation = ObjectAnimator.ofFloat(appBarShadow, View.ALPHA, 0f, 1f)
+                appBarShadowAlphaAnimation.duration = anim.duration
+                appBarShadowAlphaAnimation.start()
+            }
+        } else {
+            dismissAllowingStateLoss()
+        }
     }
 
+    /**
+     * open dialog - animating when Api >= LOLLIPOP
+     */
     open protected fun openDialog() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fakeAVCardView.visibility = View.GONE
+            recyclerView.visibility = View.GONE
+            separatorView.visibility = View.GONE
 
+            fakeAVCardView.viewTreeObserver.addOnGlobalLayoutListener(
+                    object : ViewTreeObserver.OnGlobalLayoutListener {
+
+                        override fun onGlobalLayout() {
+                            fakeAVCardView.visibility = View.VISIBLE
+                            val anim = ViewAnimationUtils.createCircularReveal(
+                                    fakeAVCardView,
+                                    (fakeAVCardView.measuredWidth - Global.dipMultiplier * 16).toInt(),
+                                    fakeAVCardView.measuredHeight / 2,
+                                    0f,
+                                    fakeAVCardView.measuredWidth - Global.dipMultiplier * 16
+                            )
+                            val onGlobalLayoutListener = this
+                            anim.addListener(object : Animator.AnimatorListener {
+                                override fun onAnimationRepeat(animation: Animator?) {
+                                }
+
+                                override fun onAnimationEnd(animation: Animator?) {
+                                    fakeAVCardView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+                                }
+
+                                override fun onAnimationCancel(animation: Animator?) {
+                                    fakeAVCardView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+                                }
+
+                                override fun onAnimationStart(animation: Animator?) {
+                                }
+
+                            })
+                            anim.start()
+
+                            val dialogBackgroundColors = arrayOf(
+                                    ColorDrawable(ContextCompat.getColor(violinActivity as Context, android.R.color.transparent)),
+                                    ColorDrawable(ContextCompat.getColor(violinActivity as Context, R.color.dialog_transparent))
+                            )
+                            val dialogBackgroundTransition = TransitionDrawable(dialogBackgroundColors)
+                            rootView!!.background = dialogBackgroundTransition
+                            dialogBackgroundTransition.startTransition(anim.duration.toInt())
+
+                            val appBar = (violinActivity as ViolinActivity).appBar
+                            if (appBar != null) {
+                                val appBarAlphaAnimation = ObjectAnimator.ofFloat(appBar, View.ALPHA, 1f, 0f)
+                                appBarAlphaAnimation.duration = anim.duration
+                                appBarAlphaAnimation.start()
+                            }
+                            val appBarShadow = (violinActivity as ViolinActivity).appBarShadow
+                            if (appBarShadow != null) {
+                                val appBarShadowAlphaAnimation = ObjectAnimator.ofFloat(appBarShadow, View.ALPHA, 1f, 0f)
+                                appBarShadowAlphaAnimation.duration = anim.duration
+                                appBarShadowAlphaAnimation.start()
+                            }
+                        }
+                    }
+            )
+        }
     }
 
+    /**
+     * voice input and clear button visibility
+     */
     private fun setButtonVisibility() {
         val btnClear = findViewById(R.id.btn_search_clear)!!
         val btnVoice = findViewById(R.id.btn_search_voice)!!
@@ -138,6 +290,22 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment() {
         }
     }
 
+    /**
+     * start the search
+     */
+    open protected fun startSearch() {
+        try {
+            onSearchTextChanged(searchEditText.text.toString())
+        } catch(e: Throwable) {
+            Debug.logException(e)
+        }
+    }
+
+    /**
+     * receive search text change
+     */
+    abstract fun onSearchTextChanged(searchText: String)
+
     open class PlayBinder(on: PlayingViolin, view: View) : AbsModelViewBinder(on, view) {
 
         override fun bind(model: Modeling<*>?) {
@@ -150,7 +318,16 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment() {
                         }
 
                         override fun afterTextChanged(s: Editable?) {
-                            (on as AbsSearchFakeActionView).setButtonVisibility()
+                            try {
+                                val on = on as AbsSearchFakeActionView
+                                on.setButtonVisibility()
+                                on.searchEditText.handler.removeCallbacks(
+                                        on.searchRunnable
+                                )
+                                on.searchEditText.handler.postDelayed(on.searchRunnable, on.searchDelay)
+                            } catch(e: Throwable) {
+
+                            }
                         }
 
                     }

@@ -20,7 +20,7 @@ import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.model.entity.SelfLoadableModeling
 import ds.violin.v1.datasource.dataloading.DataLoading
 import ds.violin.v1.model.modeling.JSONModel
-import org.json.JSONObject
+import org.json.simple.JSONObject
 import java.io.Serializable
 
 /**

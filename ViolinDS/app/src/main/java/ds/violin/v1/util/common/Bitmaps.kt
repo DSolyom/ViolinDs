@@ -36,13 +36,10 @@ import android.provider.MediaStore
 object Bitmaps {
 
     /**
-
+     *
      * @param url
-     * *
      * @return
-     * *
      * @throws IOException
-     * *
      * @throws OutOfMemoryError
      */
     @Throws(IOException::class, OutOfMemoryError::class)
@@ -63,13 +60,10 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param url
-     * *
      * @return
-     * *
      * @throws IOException
-     * *
      * @throws OutOfMemoryError
      */
     @Throws(IOException::class, OutOfMemoryError::class)
@@ -90,9 +84,8 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param bytes
-     * *
      * @return
      */
     fun createBitmap(bytes: ByteArray): Bitmap {
@@ -103,15 +96,11 @@ object Bitmaps {
      * create a thumbnail (png, 100 quality) from byte array
      * this first creates a bitmap from the byte array, then scales that bitmap
      * !please note: this does not checks if the input byteArray is 'small' enough to create the bitmap
-
+     *
      * @param byteArray
-     * *
      * @param width
-     * *
      * @param height
-     * *
      * @throws OutOfMemoryError
-     * *
      * @return
      */
     @Throws(OutOfMemoryError::class)
@@ -126,15 +115,11 @@ object Bitmaps {
      * create a thumbnail's byte array
      * this first creates a bitmap from the byte array, then scales that bitmap and converts that to byte array
      * !please note: this does not checks if the input byteArray is 'small' enough to create the bitmap(s)
-
+     *
      * @param byteArray
-     * *
      * @param maxWidth
-     * *
      * @param maxHeight
-     * *
      * @throws OutOfMemoryError
-     * *
      * @return
      */
     @Throws(OutOfMemoryError::class)
@@ -152,13 +137,10 @@ object Bitmaps {
     /**
      * gives back another bitmap resized so size is inside maxWidth and maxHeight
      * !note: does not recycle the input bitmap and may return the original bitmap (if no scaling was necessary)
-
+     *
      * @param bmp
-     * *
      * @param maxWidth
-     * *
      * @param maxHeight
-     * *
      * @return
      */
     fun resizeBitmap(bmp: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
@@ -169,15 +151,11 @@ object Bitmaps {
     /**
      * gives back another bitmap resized so size is inside maxWidth and maxHeight
      * !note: may return the original bitmap (if no scaling was necessary)
-
+     *
      * @param bmp
-     * *
      * @param maxWidth
-     * *
      * @param maxHeight
-     * *
      * @param recycle
-     * *
      * @return
      */
     fun resizeBitmap(bmp: Bitmap, maxWidth: Int, maxHeight: Int, recycle: Boolean): Bitmap {
@@ -195,13 +173,10 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param byteArray
-     * *
      * @param maxWidth
-     * *
      * @param maxHeight
-     * *
      * @return
      */
     fun findNewBitmapSize(byteArray: ByteArray, maxWidth: Int, maxHeight: Int): Point? {
@@ -216,15 +191,11 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param oWidth
-     * *
      * @param oHeight
-     * *
      * @param maxWidth
-     * *
      * @param maxHeight
-     * *
      * @return
      */
     fun findNewBitmapSize(oWidth: Int, oHeight: Int, maxWidth: Int, maxHeight: Int): Point {
@@ -247,13 +218,10 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param byteArray
-     * *
      * @param approxWidth
-     * *
      * @param approxHeight
-     * *
      * @return
      */
     fun createThumbnailApprox(byteArray: ByteArray, approxWidth: Int, approxHeight: Int): Bitmap? {
@@ -286,9 +254,7 @@ object Bitmaps {
     }
 
     /**
-
      * @param bmp
-     * *
      * @return
      */
     fun compressBitmapToByteArray(bmp: Bitmap): ByteArray {
@@ -298,13 +264,10 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param bmp
-     * *
      * @param format
-     * *
      * @param quality
-     * *
      * @return
      */
     fun compressBitmapToByteArray(bmp: Bitmap, format: Bitmap.CompressFormat, quality: Int): ByteArray {
@@ -314,15 +277,11 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param context
-     * *
      * @param uri
-     * *
      * @param approxWidth
-     * *
      * @param approxHeight
-     * *
      * @return
      */
     fun getThumbnailInternal(context: Context, uri: Uri, approxWidth: Int, approxHeight: Int): Bitmap? {
@@ -360,13 +319,10 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param imageFileName
-     * *
      * @param approxWidth
-     * *
      * @param approxHeight
-     * *
      * @return
      */
     fun getThumbnail(imageFileName: String, approxWidth: Int, approxHeight: Int): Bitmap? {
@@ -408,13 +364,10 @@ object Bitmaps {
     }
 
     /**
-
+     *
      * @param url
-     * *
      * @param approxWidth
-     * *
      * @param approxHeight
-     * *
      * @return
      */
     @Throws(IOException::class)
@@ -477,11 +430,8 @@ object Bitmaps {
     }
 
     /**
-
      * @param url
-     * *
      * @return
-     * *
      * @throws IOException
      */
     @Throws(IOException::class)
@@ -815,18 +765,4 @@ object Bitmaps {
         }
     }
 }
-/**
- * create a thumbnail's byte array (png, 100 quality)
- * this first creates a bitmap from the byte array, then scales that bitmap and converts that to byte array
- * !please note: this does not checks if the input byteArray is 'small' enough to create the bitmap(s)
 
- * @param byteArray
- * *
- * @param maxWidth
- * *
- * @param maxHeight
- * *
- * @throws OutOfMemoryError
- * *
- * @return
- */

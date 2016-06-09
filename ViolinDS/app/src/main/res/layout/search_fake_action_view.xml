@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:violin="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
+    xmlns:violin="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/dialog_transparent"
     >
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cv_fake_action_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/padding_half"
-        android:layout_marginLeft="@dimen/padding_small"
-        android:layout_marginRight="@dimen/padding_small"
+        android:layout_marginLeft="@dimen/padding_half"
+        android:layout_marginRight="@dimen/padding_half"
         android:layout_marginTop="@dimen/padding_half"
-        violin:cardBackgroundColor="@android:color/white"
-        >
+        violin:cardBackgroundColor="@color/actionbar_search_bg">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <!-- Search Input -->
             <LinearLayout
@@ -29,8 +29,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/padding_half"
-                android:paddingRight="@dimen/padding_half"
-                >
+                android:paddingRight="@dimen/padding_half">
 
                 <ImageView
                     android:id="@+id/btn_search_close"
@@ -41,12 +40,14 @@
                     android:paddingLeft="@dimen/padding_small"
                     android:paddingRight="@dimen/padding_small"
                     android:src="@drawable/ic_search_close"
-                    android:tint="#A0FFFFFF"
+                    android:tint="@color/actionbar_search_close_tint"
                     />
 
                 <EditText
                     android:id="@+id/et_search"
                     style="@style/Text"
+                    android:textColor="@color/actionbar_search_text"
+                    android:textColorHint="@color/actionbar_search_hint"
                     android:layout_width="0dp"
                     android:layout_height="36dip"
                     android:layout_weight="1"
@@ -69,6 +70,7 @@
                     android:paddingLeft="@dimen/padding_small"
                     android:paddingRight="@dimen/padding_small"
                     android:src="@drawable/ic_search_voice"
+                    android:tint="@color/actionbar_search_icon_tint"
                     />
 
                 <ImageView
@@ -81,20 +83,20 @@
                     android:paddingRight="@dimen/padding_small"
                     android:src="@drawable/ic_search_clear"
                     android:visibility="gone"
+                    android:tint="@color/actionbar_search_icon_tint"
                     />
             </LinearLayout>
-            
+
             <!-- Search Suggestions -->
             <View
+                android:id="@+id/separator"
                 style="@style/Separator"
-                android:background="@color/separator"
-                />
+                android:background="@color/actionbar_search_separator" />
 
             <ds.violin.v1.widget.IRecyclerView
                 android:id="@+id/lv_suggestions"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 

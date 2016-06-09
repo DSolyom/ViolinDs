@@ -21,7 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import ds.violin.v1.app.violin.AbsRecyclerViewAdapter
 import ds.violin.v1.app.violin.PlayingViolin
-import ds.violin.v1.model.modeling.ModelListing
+import ds.violin.v1.model.modeling.ListModeling
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.model.modeling.SerializableMapModel
 import ds.violin.v1.viewmodel.AbsModelRowBinder
@@ -53,7 +53,7 @@ open class sectionHeaderAndRowBinder(sectionHeaderBinder: AbsModelRowBinder, row
  * an adapter with headers for IRecyclerViews and [sections] (section headers)
  */
 abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
-        AbsRecyclerViewAdapter(on), ModelListing<LIST, MODEL> {
+        AbsRecyclerViewAdapter(on), ListModeling<LIST, MODEL> {
 
     companion object {
         const val VIEWTYPE_HEADER = Int.MAX_VALUE
@@ -174,14 +174,14 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
     /**
      * return real item view type for given !data! position
      */
-    fun getRealItemViewType(position: Int): Int {
+    open fun getRealItemViewType(position: Int): Int {
         return VIEWTYPE_DEFAULT
     }
 
     /**
      * return section view type for given !list! position
      */
-    fun getSectionHeaderViewType(position: Int): Int {
+    open fun getSectionHeaderViewType(position: Int): Int {
         return VIEWTYPE_SECTION_HEADER
     }
 
@@ -206,19 +206,21 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
         if (sections.containsKey(position)) {
 
             /** section header */
-            (holder as ModelViewBinding<Modeling<*>>).bind(sections[position]!!)
+            if (holder is AbsModelRowBinder) {
+                holder.bind(sections[position]!!, position)
+            } else {
+                (holder as ModelViewBinding<Modeling<*>>).bind(sections[position]!!)
+            }
         } else {
             /** normal data */
-            val rowDataModel = getRowDataModel(position - sectionOffsetFor(position))
-            (holder as ModelViewBinding<Modeling<*>>).bind(rowDataModel)
+            val dataPosition = position - sectionOffsetFor(position)
+            val rowDataModel = getRowDataModel(dataPosition)
+            if (holder is AbsModelRowBinder) {
+                holder.bind(rowDataModel, dataPosition)
+            } else {
+                (holder as ModelViewBinding<Modeling<*>>).bind(rowDataModel)
+            }
         }
-    }
-
-    /**
-     * get data [Modeling] for the row to bind
-     */
-    open fun getRowDataModel(dataPosition: Int): Modeling<*> {
-        return get(dataPosition)
     }
 
     override fun getItemCount(): Int {
@@ -232,6 +234,13 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
                     else -> 1
                 }
     }
+
+    /**
+     * get data [Modeling] for the row to bind
+     * !note: usually this creates modeling with value get(dataPosition), exception is mostly when the
+     *        adapter's data is provided from another list in which case [get] usually unsupported
+     */
+    abstract fun getRowDataModel(dataPosition: Int): Modeling<*>
 
     /**
      * create the [ModelViewBinding] for a row with [viewType] view type

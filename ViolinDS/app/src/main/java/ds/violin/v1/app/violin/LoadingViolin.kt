@@ -16,11 +16,10 @@
 
 package ds.violin.v1.app.violin
 
-import android.app.Activity
-import android.app.Fragment
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
+import android.view.View
 import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.model.entity.SelfLoadable
@@ -50,6 +49,11 @@ interface LoadingViolin {
     var idsOfParcelable: ArrayList<String>
     /** = ArrayList() #ProtectedGet, #PrivateSet */
     var idsOfLoaded: ArrayList<String>
+
+    /** #Protected - the loading indicator view's id */
+    val loadingViewID: Int?
+    /** = null -  the loading indicator view - set in [onViewCreated] */
+    var loadingView: View?
 
     /**
      * register a [SelfLoadable] entity to automatically handle it's loading and state saving
@@ -101,13 +105,20 @@ interface LoadingViolin {
         }
     }
 
+    fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        loadingView = (this as PlayingViolin).findViewById(loadingViewID ?: 0)
+    }
+
     /**
      * call as one of the last thing you do in [PlayingViolin.play]
      */
     fun play() {
-        for (registered in registeredEntities.values) {
-            loadEntity(registered.entity, registered.completionOnLoad)
+        if (!(this as PlayingViolin).played) {
+            for (registered in registeredEntities.values) {
+                loadEntity(registered.entity, registered.completionOnLoad)
+            }
         }
+        toggleLoadingViewVisibility()
     }
 
     /**
@@ -120,6 +131,7 @@ interface LoadingViolin {
     fun loadEntity(entity: SelfLoadable, completion: (entity: SelfLoadable, error: Throwable?) -> Unit): Boolean {
         val loading = entity.load { entity, error ->
             loadingEntities.remove(entity)
+            toggleLoadingViewVisibility()
             completion(entity, error)
         }
         if (loading) {
@@ -143,12 +155,41 @@ interface LoadingViolin {
      * invalidate all registered entities
      *
      * @see [PlayingViolin.invalidateRegisteredEntities]
+     *
+     * @param subViolinsToo
      */
     fun invalidateRegisteredEntities(subViolinsToo: Boolean = false) {
         for (registered in registeredEntities.values) {
             interruptEntity(registered.entity)
             registered.entity.valid = false
         }
+    }
+
+    /**
+     * toggle loading indicator view visibility
+     */
+    open fun toggleLoadingViewVisibility() {
+        if (loadingView != null) {
+            loadingView!!.visibility = when (shouldShowLoading()) {
+                true -> View.VISIBLE
+                false -> View.GONE
+            }
+        }
+    }
+
+    /**
+     * should show the loading indicator ?
+     * by default only shows loading when all entities are loading
+     *
+     * @return
+     */
+    open fun shouldShowLoading(): Boolean {
+        for (registered in registeredEntities.values) {
+            if (!registered.entity.dataLoader.loading) {
+                return false
+            }
+        }
+        return true
     }
 
     /**
@@ -279,6 +320,19 @@ interface LoadingViolin {
     fun stopEverything() {
         for (i in (loadingEntities.size - 1) downTo 0) {
             interruptEntity(loadingEntities[i])
+        }
+    }
+
+    /**
+     * try to load unloaded entities when network connection restored
+     */
+    fun onConnectionChanged(connected: Boolean) {
+        if (connected) {
+            for (registered in registeredEntities.values) {
+                if (!registered.entity.valid) {
+                    loadEntity(registered.entity, registered.completionOnLoad)
+                }
+            }
         }
     }
 }

@@ -30,6 +30,10 @@ interface ModelViewBinding<MODEL> : ViewBinding {
         return bind(value, viewResID, method, on, rootView)
     }
 
+    fun bind(value: Any?, view: View, method: Int): Any? {
+        return bind(value, view, method, on)
+    }
+
     /**
      * #Private - call this, when [rootView] and [on] is not set in the constructor
      *

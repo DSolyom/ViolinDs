@@ -53,6 +53,8 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     var rootViewId: Int?
     /** = null, #PrivateSet - parent for this Violin (activity for fragments, fragment for child fragments) */
     var parentViolin: PlayingViolin?
+    /** = false - flag to indicate that [play] was called at least once after the view structure is created */
+    var played: Boolean
 
     /**
      * fragment: lateinit - #PrivateSet - the [ActivityViolin] every [FragmentViolin] is in
@@ -84,12 +86,19 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     /**
      * to have this in other Violins, not just in [Activity]s
      */
-    fun findViewById(layoutResID: Int): View?
+    fun findViewById(layoutResID: Int): View? {
+        if (rootView?.id == layoutResID) {
+            return rootView
+        }
+        return rootView?.findViewById(layoutResID)
+    }
 
     /**
      * #Protected, this is where stuff should happen :)
      */
-    fun play()
+    fun play() {
+        played = true
+    }
 
     /**
      * #Protected, can call play? override when needed
@@ -214,10 +223,14 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
      * and call onAgreed if user accepted the request
      * - or just do nothing if the app can work without the permission
      *
+     * default behavior is to just ask for the permission again
+     *
      * @param permissionPackId
      * @param onAgreed
      */
-    fun showRequestPermissionRationale(permissionPackId: String, onAgreed: () -> Unit) {}
+    fun showRequestPermissionRationale(permissionPackId: String, onAgreed: () -> Unit) {
+        onAgreed()
+    }
 
     fun requestPermissions(permissions: Array<String>) {
         ActivityCompat.requestPermissions(violinActivity as Activity,

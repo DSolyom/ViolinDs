@@ -22,10 +22,14 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Api
 import com.google.android.gms.common.api.GoogleApiClient
 
+/**
+ * Basic interface to use [GoogleApiClient] in Violins
+ */
 interface GoogleApiViolin {
 
+    /** = ArrayList(), required Apis */
     val requiredApis: MutableList<Api<*>>
-
+    /** = null, #Private */
     var googleApiClient: GoogleApiClient?
 
     fun onCreate(savedInstanceState: Bundle?) {

@@ -35,6 +35,7 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override var rootView: View? = null
     override var rootViewId: Int? = null
     override var parentViolin: PlayingViolin? = null
+    override var played: Boolean = false
     override lateinit var violinActivity: ActivityViolin
 
     override val registeredEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
@@ -42,6 +43,9 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override var savedStates: HashMap<String, Any> = HashMap()
     override var idsOfParcelable: ArrayList<String> = ArrayList()
     override var idsOfLoaded: ArrayList<String> = ArrayList()
+
+    override val loadingViewID: Int? = null
+    override var loadingView: View? = null
 
     override val requestedPermissions: MutableMap<String, PlayingViolin.RequestedPermission> = HashMap()
 
@@ -66,6 +70,7 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super<FragmentViolin>.onViewCreated(view, savedInstanceState)
+        super<LoadingViolin>.onViewCreated(view, savedInstanceState)
     }
 
     override fun invalidateRegisteredEntities(subViolinsToo: Boolean) {
@@ -74,7 +79,8 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     }
 
     override fun play() {
-        super.play()
+        super<LoadingViolin>.play()
+        super<FragmentViolin>.play()
     }
 
     override fun onResume() {
@@ -101,7 +107,6 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
         super.restoreInstanceState(savedInstanceState)
     }
 
-
     override fun onDestroyView() {
         super<FragmentViolin>.onDestroyView()
         super<DialogFragment>.onDestroyView()
@@ -125,5 +130,10 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super<FragmentViolin>.onActivityResult(requestCode, resultCode, data)
         super<DialogFragment>.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onConnectionChanged(connected: Boolean) {
+        super<FragmentViolin>.onConnectionChanged(connected)
+        super<LoadingViolin>.onConnectionChanged(connected)
     }
 }

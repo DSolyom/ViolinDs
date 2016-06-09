@@ -34,4 +34,10 @@ abstract class AbsModelRowBinder(on: PlayingViolin, parent: ViewGroup, rowLayout
 
     override var on: PlayingViolin = on
     override var rootView: View = itemView
+
+    abstract fun bind(model: Modeling<*>, position: Int)
+
+    override fun bind(model: Modeling<*>) {
+        throw UnsupportedOperationException()
+    }
 }

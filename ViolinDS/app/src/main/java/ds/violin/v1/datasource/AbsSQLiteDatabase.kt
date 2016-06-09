@@ -20,11 +20,13 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteStatement
-import ds.violin.v1.model.modeling.JSONArrayModelListing
+import ds.violin.v1.model.modeling.JSONArrayListModeling
 import ds.violin.v1.datasource.sqlite.*
 import ds.violin.v1.datasource.base.Api
 import ds.violin.v1.datasource.base.RequestDescriptor
+import ds.violin.v1.model.modeling.CursorModel
 import ds.violin.v1.model.modeling.IterableModeling
+import ds.violin.v1.model.modeling.JSONModel
 
 /**
  * basic [SQLiteQueryExecuting] to execute normal query, good for most cases
@@ -42,7 +44,7 @@ open class BaseSQLiteQueryExecutor(connections: Array<TableConnection>) : SQLite
 }
 
 /**
- * basic [SQLiteModelStatementExecuting] to insert/update a [JSONArrayModelListing] into a table
+ * basic [SQLiteModelStatementExecuting] to insert/update a [JSONArrayListModeling] into a table
  * this only works for data belonging to only this one table
  */
 open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
@@ -66,7 +68,7 @@ open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
             // always use transaction with bulk execution
             recipient.beginTransaction()
 
-            val data: JSONArrayModelListing = request.params as JSONArrayModelListing
+            val data: JSONArrayListModeling = request.params as JSONArrayListModeling
 
             val dSize = data.size
             if (dSize == 0) {
@@ -85,12 +87,12 @@ open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
              * columns to insert into the same table, [createStatements] should get a 'row' where
              * all required columns are filled (probably with dummy data)
              */
-            createStatements(request.target as Table, data.get(0) as IterableModeling<*>, recipient)
+            createStatements(request.target as Table, JSONModel(data.get(0)), recipient)
 
             for (i in 0..dSize - 1) {
 
                 /** binding row values - this returns the value of the [Table.idColumn] in the row */
-                bind(request.target as Table, data.get(i))
+                bind(request.target as Table, JSONModel(data.get(i)))
 
                 // statement is a go
                 if (executeStatements() != null) {
