@@ -72,7 +72,7 @@ interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>> {
     }
 }
 
-interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData {
+interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData, Serializable {
 
     override fun get(key: String): Any? {
         return values!![key]

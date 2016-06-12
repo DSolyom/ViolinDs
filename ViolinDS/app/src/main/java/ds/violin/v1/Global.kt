@@ -148,7 +148,8 @@ interface Global {
         }
 
         /**
-         * check activity if data reloading is requested
+         * check activity if data reloading is requested also presumed it's handled and remove
+         * the request (id)
          */
         fun shouldInvalidateEntities(myId: String): Boolean {
             if (preferences.getBoolean(TAG_ACTIVITY_REFRESH + myId, false)) {
@@ -216,7 +217,6 @@ private object ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbac
     }
 
     override fun onActivityStarted(activity: Activity) {
-
         Global.currentActivity = activity
 
         if (activity is ActivityViolin) {
@@ -228,7 +228,6 @@ private object ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbac
     }
 
     override fun onActivityResumed(activity: Activity) {
-
         Global.currentActivity = activity
 
         if (activity is ActivityViolin) {
@@ -237,7 +236,6 @@ private object ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbac
     }
 
     override fun onActivityPaused(activity: Activity) {
-
         if (activity == Global.currentActivity) {
             Global.currentActivity = null
         }

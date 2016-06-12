@@ -29,7 +29,7 @@ interface ListModeling<LIST, MODEL> {
     var models: LIST
     val size: Int
 
-    fun get(index: Int): MODEL?
+    operator fun get(index: Int): MODEL?
 
     fun add(index: Int, value: MODEL)
     fun add(index: Int, value: Modeling<MODEL>)

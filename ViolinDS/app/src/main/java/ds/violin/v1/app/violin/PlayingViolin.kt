@@ -74,7 +74,9 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
      * override to act when receiving data from another Violin - it's generally good to call super (this)
      */
     fun onTransport(data: Serializable?): Serializable? {
-
+        for (violin in violins.values) {
+            violin.onTransport(data)
+        }
         return data
     }
 

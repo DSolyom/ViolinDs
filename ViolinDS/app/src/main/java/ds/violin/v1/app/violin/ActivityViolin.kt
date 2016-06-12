@@ -147,15 +147,20 @@ interface ActivityViolin : PlayingViolin {
      * [transportData] is cleared and reload request is dealt with (@see [Global.invalidateEntitiesIn])
      */
     fun onStarted() {
+        onEnter((this as Activity).intent)
+
+        startSharedElementEnterTransition()
+    }
+
+    /**
+     * #Protected - [Activity.onResume]
+     */
+    fun onResume() {
+        afterTransport = false
+
         if (Global.shouldInvalidateEntities(this.Id)) {
             invalidateRegisteredEntities(true)
         }
-
-        onEnter((this as Activity).intent)
-
-        afterTransport = false
-
-        startSharedElementEnterTransition()
     }
 
     /**

@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
 import android.view.View
+import ds.violin.v1.Global
 import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.model.entity.SelfLoadable
@@ -109,15 +110,20 @@ interface LoadingViolin {
         loadingView = (this as PlayingViolin).findViewById(loadingViewID ?: 0)
     }
 
+    fun onResume() {
+        if (Global.shouldInvalidateEntities((this as PlayingViolin).Id)) {
+            invalidateRegisteredEntities(true)
+        }
+    }
+
     /**
      * call as one of the last thing you do in [PlayingViolin.play]
      */
     fun play() {
-        if (!(this as PlayingViolin).played) {
-            for (registered in registeredEntities.values) {
-                loadEntity(registered.entity, registered.completionOnLoad)
-            }
+        for (registered in registeredEntities.values) {
+            loadEntity(registered.entity, registered.completionOnLoad)
         }
+
         toggleLoadingViewVisibility()
     }
 
@@ -162,6 +168,9 @@ interface LoadingViolin {
         for (registered in registeredEntities.values) {
             interruptEntity(registered.entity)
             registered.entity.valid = false
+        }
+        if ((this as PlayingViolin).canPlay()) {
+            play()
         }
     }
 

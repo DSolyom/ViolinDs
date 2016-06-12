@@ -70,6 +70,11 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
         // save instance stet here
     }
 
+    override fun onResume() {
+        super<ActivityViolin>.onResume()
+        super<AppCompatActivity>.onResume()
+    }
+
     override fun onBackPressed() {
         if (!actOnBackPressed()) {
             super.onBackPressed()
