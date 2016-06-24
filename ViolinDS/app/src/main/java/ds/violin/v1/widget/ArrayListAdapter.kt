@@ -20,6 +20,7 @@ import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.model.modeling.MutableListModeling
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
+import ds.violin.v1.widget.adapter.AbsListModelingAdapter
 import java.util.*
 
 /**
@@ -27,8 +28,8 @@ import java.util.*
  *
  * this type of adapter can be used for [IRecyclerView]s when the data is already present
  */
-abstract class ArrayListAdapter<MODEL>(on: PlayingViolin, models: MutableList<MODEL> = ArrayList()) :
-        AbsHeaderedAdapter<MutableList<MODEL>, MODEL>(on), MutableListModeling<MODEL> {
+abstract class ArrayListAdapter<VALUE>(on: PlayingViolin, values: MutableList<VALUE> = ArrayList()) :
+        AbsListModelingAdapter<MutableList<VALUE>, VALUE>(on), MutableListModeling<VALUE> {
 
-    override var models: MutableList<MODEL> = models
+    override var values: MutableList<VALUE> = values
 }

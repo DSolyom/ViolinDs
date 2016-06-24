@@ -18,13 +18,13 @@ package ds.violin.v1.model
 import android.database.Cursor
 import ds.violin.v1.model.entity.SelfLoadableModeling
 import ds.violin.v1.model.modeling.CursorModel
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 
 /**
  * entity holding it's data in a [CursorModel]
  */
 open class CursorEntity(values: Cursor? = null, cursorPosition: Int = 0) :
-        CursorModel(values, cursorPosition), SelfLoadableModeling<Cursor> {
+        CursorModel(values, cursorPosition), SelfLoadableModeling<Cursor, Any> {
 
     override lateinit var dataLoader: DataLoading
     override var valid: Boolean = false

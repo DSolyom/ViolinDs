@@ -17,7 +17,7 @@
 package ds.violin.v1.model
 
 import ds.violin.v1.model.entity.SelfLoadableModeling
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.modeling.MapModel
 import ds.violin.v1.model.modeling.SerializableMapModel
 import java.io.Serializable
@@ -27,7 +27,7 @@ import java.util.*
  * entity holding it's data in a [MapModel]
  */
 open class MapEntity(values: MutableMap<String, Any> = HashMap()) :
-        MapModel(values), SelfLoadableModeling<MutableMap<String, Any>> {
+        MapModel(values), SelfLoadableModeling<MutableMap<String, Any>, Any> {
 
     override lateinit var dataLoader: DataLoading
     override var valid: Boolean = false
@@ -35,7 +35,7 @@ open class MapEntity(values: MutableMap<String, Any> = HashMap()) :
 }
 
 open class SerializableMapEntity(values: MutableMap<String, Serializable> = HashMap()) :
-        SerializableMapModel(values), SelfLoadableModeling<MutableMap<String, Serializable>> {
+        SerializableMapModel(values), SelfLoadableModeling<MutableMap<String, Serializable>, Serializable> {
 
     override lateinit var dataLoader: DataLoading
     override var valid: Boolean = false

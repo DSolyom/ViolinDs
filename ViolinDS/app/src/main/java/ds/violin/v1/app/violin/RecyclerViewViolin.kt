@@ -25,10 +25,14 @@ import ds.violin.v1.R
 import ds.violin.v1.app.violin.LoadingViolin
 import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.entity.SelfLoadable
+import ds.violin.v1.model.modeling.Modeling
+import ds.violin.v1.model.modeling.SerializableMapModel
 import ds.violin.v1.util.common.Debug
+import ds.violin.v1.viewmodel.AbsModelRecyclerViewItemBinder
 import ds.violin.v1.viewmodel.binding.ModelViewBinding
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
 import ds.violin.v1.widget.IRecyclerView
+import java.util.*
 
 interface RecyclerViewViolin {
 
@@ -72,7 +76,7 @@ interface RecyclerViewViolin {
      */
     fun play() {
         if (!(this as PlayingViolin).played) {
-            if (adapter is AbsHeaderedAdapter<*, *>) {
+            if (adapter is AbsHeaderedAdapter) {
                 ensureListHeaderAndFooter()
             }
 
@@ -292,5 +296,6 @@ open class RecyclerViewAdapterBinder(layoutManager: RecyclerView.LayoutManager) 
 abstract class AbsRecyclerViewAdapter(on: PlayingViolin) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    /** */
     val on: PlayingViolin = on
 }

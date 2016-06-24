@@ -16,7 +16,7 @@
 
 package ds.violin.v1.datasource.networking
 
-import ds.violin.v1.datasource.dataloading.Interruptable
+import ds.violin.v1.datasource.base.Interruptable
 import ds.violin.v1.datasource.networking.HttpParams
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -46,7 +46,7 @@ interface PostBodyStreamer : Interruptable {
 class GetSerializer {
 
     /**
-     * return urlencoded GET query path from [params]
+     * return urlencoded GET query path from [params].getParams which can be a [String], [JSONObject] or [Map]
      */
     fun format(params: HttpParams): String {
         val ret = createKeyValueAndArrayString(params.getParams, params.charset)

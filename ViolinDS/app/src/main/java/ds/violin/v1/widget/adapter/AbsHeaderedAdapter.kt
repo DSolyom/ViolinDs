@@ -21,39 +21,13 @@ import android.view.View
 import android.view.ViewGroup
 import ds.violin.v1.app.violin.AbsRecyclerViewAdapter
 import ds.violin.v1.app.violin.PlayingViolin
-import ds.violin.v1.model.modeling.ListModeling
 import ds.violin.v1.model.modeling.Modeling
-import ds.violin.v1.model.modeling.SerializableMapModel
-import ds.violin.v1.viewmodel.AbsModelRowBinder
-import ds.violin.v1.viewmodel.binding.ModelViewBinding
-import java.util.*
-
-class SectionInfo(val afterOffset: Int) : SerializableMapModel()
+import ds.violin.v1.viewmodel.AbsModelRecyclerViewItemBinder
 
 /**
- *
+ * an adapter (for I[RecyclerView]) with header and footer
  */
-open class sectionHeaderAndRowBinder(sectionHeaderBinder: AbsModelRowBinder, rowBinder: AbsModelRowBinder) :
-        RecyclerView.ViewHolder(rowBinder.rootView), ModelViewBinding<Modeling<*>> {
-
-    override var rootView: View = rowBinder.rootView
-    override var on: PlayingViolin = rowBinder.on
-
-    val sectionHeaderBinder = sectionHeaderBinder
-    val rowBinder = rowBinder
-
-    override fun bind(model: Modeling<*>) {
-        sectionHeaderBinder.bind(model)
-        rowBinder.bind(model)
-    }
-
-}
-
-/**
- * an adapter with headers for IRecyclerViews and [sections] (section headers)
- */
-abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
-        AbsRecyclerViewAdapter(on), ListModeling<LIST, MODEL> {
+abstract class AbsHeaderedAdapter(on: PlayingViolin) : AbsRecyclerViewAdapter(on) {
 
     companion object {
         const val VIEWTYPE_HEADER = Int.MAX_VALUE
@@ -80,73 +54,6 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
             }
         }
 
-    /**
-     * section information
-     */
-    var sections: HashMap<Int, SectionInfo> = HashMap()
-
-    /**
-     * sections' position
-     */
-    var sectionList: ArrayList<Int> = ArrayList()
-
-    /**
-     * generate sections from [HashMap]
-     *
-     * !note: call from ui thread for adapters already added to a recycler view as this will change
-     *        the adapters [getItemCount] and behavior
-     */
-    fun generateSections(sectionsInfo: LinkedHashMap<Int, String>) {
-        sections.clear()
-        sectionList.clear()
-
-        var offset = 0
-        for(position in sectionsInfo.keys) {
-            sections[position + offset] = SectionInfo(offset + 1)
-            sections[position + offset]!!.put("label", sectionsInfo[position]!!)
-            sectionList.add(position + offset)
-            ++offset
-        }
-    }
-
-    /**
-     * return section number for [position]
-     */
-    fun sectionFor(position: Int): Int? {
-        if (sections.isEmpty()) {
-            return null
-        }
-
-        val sectionCount = sectionList.size
-        var prox = (sectionCount - 1) / 2
-        while(true) {
-            val slp = sectionList[prox]
-            if (slp <= position) {
-                if (prox == sectionCount - 1 || sectionList[prox + 1] > position) {
-                    return prox
-                }
-                prox = (sectionCount + prox + 1) / 2
-            } else if (slp > position) {
-                if (prox == 0) {
-                    return null
-                }
-                if (sectionList[prox - 1] <= position) {
-                    return prox - 1
-                }
-                prox /= 2
-            }
-        }
-    }
-
-    /**
-     * return section 'offset' for [position] - this is the offset to be added to data position to get
-     * real list position or subtract from list position to get real data position
-     */
-    fun sectionOffsetFor(position: Int): Int {
-        val section = sectionFor(position) ?: return 0
-        return sections[sectionList[section!!]]!!.afterOffset
-    }
-
     override fun getItemViewType(position: Int): Int {
         if (position == 0 && headerView != null) {
             return VIEWTYPE_HEADER
@@ -157,43 +64,28 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
         var position = position
         if (headerView != null) {
 
-            /** [headerView] added one to [getItemCount] */
+            /** [headerView] is not a 'real' item in this context */
             --position
         }
-        if (sections.contains(position)) {
-
-            /** section header requires section header view type */
-            return getSectionHeaderViewType(position)
-        } else {
-
-            /** real item requires real item view type */
-            return getRealItemViewType(position - sectionOffsetFor(position))
-        }
+        return getRealItemViewType(position)
     }
 
     /**
-     * return real item view type for given !data! position
+     *
      */
-    open fun getRealItemViewType(position: Int): Int {
+    internal open fun getRealItemViewType(position: Int): Int {
         return VIEWTYPE_DEFAULT
     }
 
-    /**
-     * return section view type for given !list! position
-     */
-    open fun getSectionHeaderViewType(position: Int): Int {
-        return VIEWTYPE_SECTION_HEADER
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
+    final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
         return when (viewType) {
             VIEWTYPE_HEADER -> object : RecyclerView.ViewHolder(headerView) {}
             VIEWTYPE_FOOTER -> object : RecyclerView.ViewHolder(footerView) {}
-            else -> createModelRowBinder(on, parent, viewType)
+            else -> createModelItemBinder(parent, viewType)
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    final override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder.itemView === headerView || holder.itemView === footerView) {
             return;
         }
@@ -203,47 +95,21 @@ abstract class AbsHeaderedAdapter<LIST, MODEL>(on: PlayingViolin) :
             /** [headerView] added one to [getItemCount] */
             --position
         }
-        if (sections.containsKey(position)) {
-
-            /** section header */
-            if (holder is AbsModelRowBinder) {
-                holder.bind(sections[position]!!, position)
-            } else {
-                (holder as ModelViewBinding<Modeling<*>>).bind(sections[position]!!)
-            }
-        } else {
-            /** normal data */
-            val dataPosition = position - sectionOffsetFor(position)
-            val rowDataModel = getRowDataModel(dataPosition)
-            if (holder is AbsModelRowBinder) {
-                holder.bind(rowDataModel, dataPosition)
-            } else {
-                (holder as ModelViewBinding<Modeling<*>>).bind(rowDataModel)
-            }
-        }
+        onBindViewHolder(holder as AbsModelRecyclerViewItemBinder, position)
     }
 
-    override fun getItemCount(): Int {
-        return size + sectionList.size +
-                when (headerView) {
-                    null -> 0
-                    else -> 1
-                } +
-                when (footerView) {
-                    null -> 0
-                    else -> 1
-                }
-    }
+    /**
+     * create the [ModelViewBinding] for an item with [viewType] view type
+     */
+    abstract fun createModelItemBinder(parent: ViewGroup, viewType: Int): AbsModelRecyclerViewItemBinder
+
+    abstract fun onBindViewHolder(binder: AbsModelRecyclerViewItemBinder, position: Int)
 
     /**
      * get data [Modeling] for the row to bind
      * !note: usually this creates modeling with value get(dataPosition), exception is mostly when the
      *        adapter's data is provided from another list in which case [get] usually unsupported
      */
-    abstract fun getRowDataModel(dataPosition: Int): Modeling<*>
+    abstract fun getItemDataModel(dataPosition: Int, section: Int): Modeling<*, *>
 
-    /**
-     * create the [ModelViewBinding] for a row with [viewType] view type
-     */
-    abstract fun createModelRowBinder(on: PlayingViolin, parent: ViewGroup, viewType: Int): AbsModelRowBinder
 }

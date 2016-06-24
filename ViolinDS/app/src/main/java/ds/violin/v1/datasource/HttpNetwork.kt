@@ -83,25 +83,25 @@ open class BaseHttpRequestSender : HttpRequestExecuting {
  * class to create [RequestDescriptor]s, [HttpRequestExecuting]s and handle the session's states towards a defined [host]
  *
  * @use override to create your own network api by defining the way [RequestDescriptor] are created
- *      from requestName and params (override [AbsHttpNetwork.createDescriptor])
+ *      from requestName and params (override [HttpNetwork.createDescriptor])
  *      also you may want to override [ensureState] if you need more than one session for the same host
  *
  *      use [prepareSender] to get a prepared [HttpRequestExecuting], than call [HttpRequestExecuting.execute]
  *      to start sending
  *
  *      !note: take hold of your executors when using them in the background, to be able to interrupt them
- *      !note: don't be afraid to create as many [AbsHttpNetwork] instance as you like, states are handled statically
+ *      !note: don't be afraid to create as many [HttpNetwork] instance as you like, states are handled statically
  *      TODO: do something about that statically handled state to last through the application lifecycle
  *      TODO: for now [HttpSessionHandling.sessions] is held in Application
  *
  * @param host
  */
-abstract class AbsHttpNetwork(host: String) : Api, HttpSessionHandling {
+abstract class HttpNetwork(host: String, port: String = "") : Api, HttpSessionHandling {
 
     override lateinit var state: HttpParams
 
     override val host: String = host
-    var port: String = ""
+    var port: String = port
 
     /**
      * load stuff from the net

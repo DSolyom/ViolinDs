@@ -43,6 +43,7 @@ import java.util.zip.GZIPInputStream
  * @param getParams = HashMap()
  * @param postParams = null
  * @param charset = "UTF-8"
+ * @param fragment = ""
  */
 class HttpParams(var cookieManager: CookieManager? = null,
                  val headers: MutableMap<String, String> = HashMap(),

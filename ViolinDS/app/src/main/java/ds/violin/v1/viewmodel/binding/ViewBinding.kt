@@ -237,7 +237,7 @@ interface ViewBinding {
                 IMAGE_LAZY -> {
 
                     if (value == null || (value is String && value.length == 0)) {
-                        (view as ImageView).setImageResource(R.drawable.x_empty)
+                        (view as LazyImageView).showDefault()
                     } else if (value is String) {
                         (view as LazyImageView).loadImage(ImageDescriptor(value))
                     } else {

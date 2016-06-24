@@ -25,8 +25,9 @@ import ds.violin.v1.Global
 import ds.violin.v1.util.cache.ImageFileCache
 import ds.violin.v1.util.common.Bitmaps
 import ds.violin.v1.util.common.Debug
-import ds.violin.v1.datasource.dataloading.LazyLoader
-import ds.violin.v1.datasource.dataloading.LazyLoaderTask
+import ds.violin.v1.datasource.base.LazyLoader
+import ds.violin.v1.datasource.base.LazyLoaderTask
+import java.io.FileNotFoundException
 import java.net.URL
 
 private val TAG = "ImageLoader"
@@ -100,6 +101,10 @@ object ImageLoader : LazyLoader<ImageDescriptor, Bitmap>() {
             } else {
                 bmp = Bitmaps.getResizedImageFromHttpStream(URL(descriptor.url), descriptor.maxX, descriptor.maxY);
             }
+        } catch(e: FileNotFoundException) {
+
+            // no retries
+            throw e
         } catch(e: Throwable) {
             Debug.logException(e)
             bmp = null
@@ -114,7 +119,8 @@ object ImageLoader : LazyLoader<ImageDescriptor, Bitmap>() {
         LruBitmapCache.put(descriptor.prefix + descriptor.url, bmp);
 
         // put in file cache (in another thread - so we can give this bitmap right away
-        Thread() {
+        Thread()
+        {
             FileCache.put(descriptor.prefix + descriptor.url, Bitmaps.compressBitmapToByteArray(bmp!!));
         }.start();
 
@@ -193,12 +199,10 @@ data class ImageDescriptor(var url: String, val maxXDp: Int = 0, val maxYDp: Int
     }
 }
 
-private object LruBitmapCache : LruCache<String, Bitmap>(1) {
-
-    init {
-        val am = Global.context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        resize(1024 * am.largeMemoryClass / 7)
-    }
+private object LruBitmapCache : LruCache<String, Bitmap>({
+    val am = Global.context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    1024 * am.largeMemoryClass / 7
+}()) {
 
     override fun sizeOf(key: String, bitmap: Bitmap): Int {
         return bitmap.byteCount / 1024;

@@ -26,7 +26,7 @@ import android.util.DisplayMetrics
 import ds.violin.v1.app.violin.ActivityViolin
 import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.util.common.Debug
-import ds.violin.v1.datasource.dataloading.SingleUseBackgroundWorkerThread
+import ds.violin.v1.datasource.base.SingleUseBackgroundWorkerThread
 import ds.violin.v1.datasource.sqlite.SQLiteSessionHandling
 import ds.violin.v1.util.ConnectionChecker
 import java.util.*

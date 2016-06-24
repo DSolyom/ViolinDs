@@ -16,7 +16,7 @@ limitations under the License.
 
 package ds.violin.v1.model.entity
 
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.modeling.*
 
 interface ContinuousListDataLoading : DataLoading {
@@ -154,7 +154,7 @@ interface ContinuousMutableListing<L, T> : ContinuousListing<L, T> {
         var newParts: L
         try {
             newParts = when (result) {
-                is ListModeling<*, *> -> result.models as L
+                is ListModeling<*, *> -> result.values as L
                 else -> result as L
             }
         } catch(e: Throwable) {
@@ -188,7 +188,7 @@ interface ContinuousMutableListing<L, T> : ContinuousListing<L, T> {
                 if (offsetChange > 0) {
 
                     // remove {@var offsetChange} elements from the top of the list
-                    remove(offsetChange)
+                    remove(0, offsetChange)
 
                     // and modify offset
                     offset += offsetChange

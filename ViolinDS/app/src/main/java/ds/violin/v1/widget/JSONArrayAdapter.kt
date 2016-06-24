@@ -21,13 +21,14 @@ import android.os.Parcelable
 import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.entity.SelfLoadable
 import ds.violin.v1.model.entity.SelfLoadableListModeling
 import ds.violin.v1.model.modeling.JSONArrayListModeling
 import ds.violin.v1.model.modeling.JSONModel
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
+import ds.violin.v1.widget.adapter.AbsListModelingAdapter
 import ds.violin.v1.widget.adapter.SectionInfo
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -39,7 +40,7 @@ import java.util.*
  * Parcelable data for [JSONArrayAdapterEntity] to be able to save list and section data
  */
 class JSONArrayAdapterDataParcelable(modelsString: String,
-                                     sections: HashMap<Int, SectionInfo>,
+                                     sectionInfos: ArrayList<SectionInfo>,
                                      sectionList: ArrayList<Int>) : Parcelable {
 
     companion object {
@@ -56,16 +57,16 @@ class JSONArrayAdapterDataParcelable(modelsString: String,
     }
 
     val modelsString: String = modelsString
-    val sections: HashMap<Int, SectionInfo> = sections
+    val sectionInfos: ArrayList<SectionInfo> = sectionInfos
     val sectionList: ArrayList<Int> = sectionList
 
     constructor(source: Parcel) : this(source.readString(),
-            source.readSerializable() as HashMap<Int, SectionInfo>,
+            source.readSerializable() as ArrayList<SectionInfo>,
             source.readSerializable() as ArrayList<Int>)
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
         dest!!.writeString(modelsString)
-        dest.writeSerializable(sections)
+        dest.writeSerializable(sectionInfos)
         dest.writeSerializable(sectionList)
     }
 
@@ -79,12 +80,12 @@ class JSONArrayAdapterDataParcelable(modelsString: String,
  *
  * this type of adapter can be used for [IRecyclerView]s when the data is already present
  */
-abstract class JSONArrayAdapter(on: PlayingViolin, models: JSONArray = JSONArray()) :
-        AbsHeaderedAdapter<JSONArray, JSONObject>(on), JSONArrayListModeling {
+abstract class JSONArrayAdapter(on: PlayingViolin, values: JSONArray = JSONArray()) :
+        AbsListModelingAdapter<JSONArray, JSONObject>(on), JSONArrayListModeling {
 
-    override var models: JSONArray = models
+    override var values: JSONArray = values
 
-    override fun getRowDataModel(dataPosition: Int): Modeling<*> {
+    override fun getItemDataModel(dataPosition: Int, section: Int): Modeling<*, *> {
         return JSONModel(get(dataPosition))
     }
 }
@@ -95,8 +96,8 @@ abstract class JSONArrayAdapter(on: PlayingViolin, models: JSONArray = JSONArray
  *
  * this type of adapter can be used for [IRecyclerView]s when the data requires loading
  */
-abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
-        JSONArrayAdapter(on, models), SelfLoadableListModeling<JSONArray, JSONObject>, HasParcelableData {
+abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, values: JSONArray = JSONArray()) :
+        JSONArrayAdapter(on, values), SelfLoadableListModeling<JSONArray, JSONObject>, HasParcelableData {
 
     override var interrupted: Boolean = false
     override var valid: Boolean = false
@@ -104,12 +105,12 @@ abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading
     override var dataLoader: DataLoading = dataLoader
 
     override fun dataToParcelable(): Parcelable {
-        return JSONArrayAdapterDataParcelable(models.toString(), sections, sectionList)
+        return JSONArrayAdapterDataParcelable(values.toString(), sectionInfos, sectionPositions)
     }
 
     override fun createDataFrom(parcelableData: Parcelable) {
-        models = JSONValue.parse((parcelableData as JSONArrayAdapterDataParcelable).modelsString) as JSONArray
-        sections = parcelableData.sections
-        sectionList = parcelableData.sectionList
+        values = JSONValue.parse((parcelableData as JSONArrayAdapterDataParcelable).modelsString) as JSONArray
+        sectionInfos = parcelableData.sectionInfos
+        sectionPositions = parcelableData.sectionList
     }
 }

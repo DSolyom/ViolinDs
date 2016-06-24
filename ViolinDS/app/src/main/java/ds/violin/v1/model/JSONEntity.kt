@@ -16,20 +16,18 @@
 
 package ds.violin.v1.model
 
-import ds.violin.v1.model.entity.HasSerializableData
+import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.entity.SelfLoadableModeling
-import ds.violin.v1.datasource.dataloading.DataLoading
 import ds.violin.v1.model.modeling.JSONModel
 import org.json.simple.JSONObject
-import java.io.Serializable
 
 /**
  * entity holding it's data in a [JSONModel]
  */
-open class JSONEntity(values: JSONObject = JSONObject()) :
-        JSONModel(values), SelfLoadableModeling<JSONObject> {
+open class JSONEntity(dataLoader: DataLoading, values: JSONObject = JSONObject()) :
+        JSONModel(values), SelfLoadableModeling<JSONObject, Any> {
 
-    override lateinit var dataLoader: DataLoading
+    override var dataLoader: DataLoading = dataLoader
     override var valid: Boolean = false
     override var interrupted: Boolean = false
 }

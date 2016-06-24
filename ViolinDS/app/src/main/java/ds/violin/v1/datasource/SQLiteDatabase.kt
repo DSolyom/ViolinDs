@@ -27,6 +27,8 @@ import ds.violin.v1.datasource.base.RequestDescriptor
 import ds.violin.v1.model.modeling.CursorModel
 import ds.violin.v1.model.modeling.IterableModeling
 import ds.violin.v1.model.modeling.JSONModel
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
 
 /**
  * basic [SQLiteQueryExecuting] to execute normal query, good for most cases
@@ -44,41 +46,32 @@ open class BaseSQLiteQueryExecutor(connections: Array<TableConnection>) : SQLite
 }
 
 /**
- * basic [SQLiteModelStatementExecuting] to insert/update a [JSONArrayListModeling] into a table
+ * basic [SQLiteStatementExecutor] to insert/update a [JSONArrayListModeling] into a table
  * this only works for data belonging to only this one table
  */
-open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
-
-    override var method: SQLiteModelStatementExecuting.Method = SQLiteModelStatementExecuting.Method.INSERT_UPDATE
+open class BaseSQLiteModelStatementExecutor() : SQLiteStatementExecutor(), SQLiteModelDataExecuting {
 
     override lateinit var request: RequestDescriptor<Any>
     override lateinit var recipient: SQLiteDatabase
-
-    override lateinit var columns: Array<Column?>
-    override var columnCount: Int = 0
-
-    override var insertStatement: SQLiteStatement? = null
-    override var updateStatement: SQLiteStatement? = null
 
     override var sending: Boolean = false
     override var interrupted: Boolean = false
 
     override fun executeForResult(): Int? {
         try {
-            // always use transaction with bulk execution
-            recipient.beginTransaction()
 
-            val data: JSONArrayListModeling = request.params as JSONArrayListModeling
+            val data: JSONArray = request.params as JSONArray
 
             val dSize = data.size
             if (dSize == 0) {
 
                 // no data - nothing to do
-                recipient.endTransaction()
-
                 // no row's were modified
                 return 0
             }
+
+            // always use transaction with bulk execution
+            recipient.beginTransaction()
 
             var insertCount = 0
 
@@ -87,12 +80,12 @@ open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
              * columns to insert into the same table, [createStatements] should get a 'row' where
              * all required columns are filled (probably with dummy data)
              */
-            createStatements(request.target as Table, JSONModel(data.get(0)), recipient)
+            createStatements(request.target as Table, JSONModel(data[0] as JSONObject), recipient)
 
             for (i in 0..dSize - 1) {
 
                 /** binding row values - this returns the value of the [Table.idColumn] in the row */
-                bind(request.target as Table, JSONModel(data.get(i)))
+                bind(request.target as Table, JSONModel(data[i] as JSONObject))
 
                 // statement is a go
                 if (executeStatements() != null) {
@@ -118,20 +111,20 @@ open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
 }
 
 /**
- * class to create [RequestDescriptor]s, [SQLiteQueryExecuting]s or [SQLiteModelStatementExecuting]s
+ * class to create [RequestDescriptor]s, [SQLiteQueryExecuting]s or [SQLiteStatementExecutor]s
  * and handle the database session's with [SQLiteOpenHelper]s
  *
  * @use override to create your own database api by defining the way [RequestDescriptor] are created
- *      from queryName and params (override [AbsSQLiteDatabase.createDescriptor])
+ *      from queryName and params (override [SQLiteDatabase.createDescriptor])
  *      also you may want to override [ensureState] if you need more than one session for the same host
  *
- *      use [prepareQuery] or [prepareWriter] for a [SQLiteQueryExecuting] or [SQLiteModelStatementExecuting]
- *      and call [SQLiteQueryExecuting.execute] or [SQLiteModelStatementExecuting.execute] in them
+ *      use [prepareQuery] or [prepareWriter] for a [SQLiteQueryExecuting] or [SQLiteStatementExecutor]
+ *      and call [SQLiteQueryExecuting.execute] or [SQLiteStatementExecutor.execute] in them
  *
  *      !note: take hold of your executors when using them in the background, to be able to interrupt them
- *      !note: don't be afraid to create as many [AbsSQLiteDatabase] instance as you like,
+ *      !note: don't be afraid to create as many [SQLiteDatabase] instance as you like,
  *             states are handled statically
- *      TODO: do something about that statically handled state to last through the application lifecycle
+ *      TODO: do something about that statically handled state to last through the application life cycles
  *      TODO: for now [SQLiteSessionHandling.openHelpers] is held in Application
  *
  * @param name - name of the database to use
@@ -140,7 +133,7 @@ open class BaseSQLiteModelStatementExecutor() : SQLiteModelStatementExecuting {
  * @param connections - connections between tables for easier joins (or for harder for that matter because
  *                      using this will prevent you to create multiply connections between the same two tables)
  */
-abstract class AbsSQLiteDatabase(name: String, version: Int, tables: Array<Table>, connections: Array<TableConnection>) :
+abstract class SQLiteDatabase(name: String, version: Int, tables: Array<Table>, connections: Array<TableConnection>) :
         Api, SQLiteSessionHandling {
 
     override val tables: Array<Table> = tables
@@ -164,9 +157,9 @@ abstract class AbsSQLiteDatabase(name: String, version: Int, tables: Array<Table
     }
 
     /**
-     * prepare an [SQLiteModelStatementExecuting] for execution
+     * prepare an [SQLiteStatementExecutor] for execution
      */
-    fun prepareWriter(context: Context, target: String, params: Any): SQLiteModelStatementExecuting? {
+    fun prepareWriter(context: Context, target: String, params: Any): SQLiteModelDataExecuting? {
 
         var request: RequestDescriptor<Any>? = null
         for (table in tables) {
@@ -200,9 +193,9 @@ abstract class AbsSQLiteDatabase(name: String, version: Int, tables: Array<Table
     }
 
     /**
-     * override to create your own [SQLiteModelStatementExecuting]
+     * override to create your own [SQLiteStatementExecutor]
      */
-    open fun createWriteExecutor(): SQLiteModelStatementExecuting {
+    open fun createWriteExecutor(): SQLiteModelDataExecuting {
         return BaseSQLiteModelStatementExecutor()
     }
 }

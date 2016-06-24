@@ -16,15 +16,15 @@
 
 package ds.violin.v1.datasource.base
 
-import ds.violin.v1.datasource.dataloading.Interruptable
+import ds.violin.v1.datasource.base.Interruptable
 
 /**
  * data class for describing a request
  */
-data class RequestDescriptor<RD>(val target: Any,
-                                 val params: RD?,
-                                 val method: Int? = null,
-                                 val resultFormat: Int? = null)
+class RequestDescriptor<RD>(val target: Any,
+                            val params: RD?,
+                            val method: Int? = null,
+                            val resultFormat: Int? = null)
 
 /**
  * interface for sending a request described by a [RequestDescriptor]

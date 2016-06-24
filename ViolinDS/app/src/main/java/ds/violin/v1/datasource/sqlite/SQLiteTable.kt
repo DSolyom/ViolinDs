@@ -37,14 +37,15 @@ data class Column(val name: String, val type: Int) {
 
         /**
          * mark columns as [UNIQUE_GROUP] when they are considered unique together when
-         * using [SQLiteModelStatementExecuting.Method.UPDATE]
+         * using [SQLiteStatementExecutor.Method.UPDATE]
          */
         const val UNIQUE_GROUP = 8192
 
+        const val VS_TABLE = 32768
         const val JOINED_TABLE = 65536
         const val JOINED_ON_DELETE_TABLE = 131072
 
-        const val JOINED_MASK = JOINED_TABLE or JOINED_ON_DELETE_TABLE
+        const val JOINED_MASK = VS_TABLE or JOINED_TABLE or JOINED_ON_DELETE_TABLE
 
         const val UNICODE = 262144
         const val NOCASE = 524288
@@ -57,7 +58,17 @@ enum class JoinType {
     LEFT, INNER
 }
 
-class Table(val name: String, val columns: Array<Column>, val idColumn: String? = "id")
+class Table(val name: String, val columns: Array<Column>, val idColumn: String? = "id") {
+
+    fun findColumn(name: String): Column? {
+        for(column in columns) {
+            if (name == column.name) {
+                return column
+            }
+        }
+        return null
+    }
+}
 
 class TableConnection(val leftName: String, val leftColumn: String, val rightName: String, val rightColumn: String)
 

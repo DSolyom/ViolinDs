@@ -20,7 +20,7 @@ import android.database.Cursor
 import ds.violin.v1.model.entity.SelfLoadableListModeling
 import ds.violin.v1.model.modeling.CursorModel
 import ds.violin.v1.model.modeling.CursorListModeling
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 
 /**
  * list entity holding it's data in a [Cursor]
@@ -28,7 +28,7 @@ import ds.violin.v1.datasource.dataloading.DataLoading
 open class CursorListEntity(cursor: Cursor? = null) :
         CursorListModeling, SelfLoadableListModeling<CursorModel, Cursor> {
 
-    override var models: CursorModel = CursorModel(cursor)
+    override var values: CursorModel = CursorModel(cursor)
         set(value) {
             if (field != null && field != value) {
                 field!!.values = null

@@ -16,7 +16,7 @@ limitations under the License.
 
 package ds.violin.v1.datasource.networking
 
-import ds.violin.v1.datasource.dataloading.Interruptable
+import ds.violin.v1.datasource.base.Interruptable
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.JSONValue
@@ -51,7 +51,7 @@ interface ResponseReader : Interruptable {
      * @param cached
      * @return the response in it's original form
      */
-    fun stringToResponse(cached: String): Any?
+    fun stringToResponse(input: String): Any?
 }
 
 /**

@@ -18,9 +18,9 @@ package ds.violin.v1.model.entity
 
 import android.os.Parcelable
 import ds.violin.v1.app.violin.LoadingViolin
-import ds.violin.v1.datasource.dataloading.BackgroundDataLoading
-import ds.violin.v1.datasource.dataloading.DataLoading
-import ds.violin.v1.datasource.dataloading.Interruptable
+import ds.violin.v1.datasource.base.BackgroundDataLoading
+import ds.violin.v1.datasource.base.DataLoading
+import ds.violin.v1.datasource.base.Interruptable
 import ds.violin.v1.model.modeling.*
 import java.io.Serializable
 
@@ -34,7 +34,7 @@ interface SelfLoadable : Interruptable {
 
     /** lateinit - loader of the data */
     var dataLoader: DataLoading
-    /** = false - is data valid, or needs loading? */
+    /** = false - is data valid or needs loading? */
     var valid: Boolean
 
     /**
@@ -43,11 +43,11 @@ interface SelfLoadable : Interruptable {
      * @param completion
      * @return true if started loading, false if it was not needed, either [SelfLoadable] is [valid] or already loading
      */
-    fun load(completion: (entity: SelfLoadable, error: Throwable?) -> Unit): Boolean {
+    fun load(completion: (SelfLoadable, Throwable?) -> Unit): Boolean {
         if (valid == true) {
             return false
         }
-        else if (dataLoader is BackgroundDataLoading) {
+        if (dataLoader is BackgroundDataLoading) {
             return (dataLoader as BackgroundDataLoading).loadInBackground { result, error ->
                 onDataLoaded(result, error, completion)
             }
@@ -101,12 +101,10 @@ interface HasParcelableData {
     fun createDataFrom(parcelableData: Parcelable)
 }
 
-interface SelfLoadableModeling<MODEL> : Modeling<MODEL>, SelfLoadable {
-
-    override var dataLoader: DataLoading
+interface SelfLoadableModeling<T, VALUE> : Modeling<T, VALUE>, SelfLoadable {
 
     override fun onDataLoaded(result: Any?, error: Throwable?,
-                              completion: (entity: SelfLoadable, error: Throwable?) -> Unit) {
+                              completion: (SelfLoadable, Throwable?) -> Unit) {
         valid = error == null
 
         if (error != null) {
@@ -116,10 +114,10 @@ interface SelfLoadableModeling<MODEL> : Modeling<MODEL>, SelfLoadable {
 
         try {
             when (result) {
-                is Modeling<*> -> {
-                    values = result.values as MODEL
+                is Modeling<*, *> -> {
+                    values = result.values as T
                 }
-                else -> values = result as MODEL
+                else -> values = result as T
             }
         } catch(e: Throwable) {
             valid = false
@@ -128,22 +126,10 @@ interface SelfLoadableModeling<MODEL> : Modeling<MODEL>, SelfLoadable {
         }
 
         completion(this, null)
-    }
-
-    override fun invalidate() {
-        dataLoader.interrupt()
-        super.invalidate()
-    }
-
-    override fun interrupt() {
-        dataLoader.interrupt()
-        super.interrupt()
     }
 }
 
-interface SelfLoadableListModeling<LIST, MODEL_TYPE> : ListModeling<LIST, MODEL_TYPE>, SelfLoadable {
-
-    override var dataLoader: DataLoading
+interface SelfLoadableListModeling<LIST, VALUE> : ListModeling<LIST, VALUE>, SelfLoadable {
 
     override fun onDataLoaded(result: Any?, error: Throwable?,
                               completion: (entity: SelfLoadable, error: Throwable?) -> Unit) {
@@ -156,8 +142,8 @@ interface SelfLoadableListModeling<LIST, MODEL_TYPE> : ListModeling<LIST, MODEL_
 
         try {
             when (result) {
-                is ListModeling<*, *> -> enslave(result as ListModeling<LIST, MODEL_TYPE>)
-                else -> models = result as LIST
+                is ListModeling<*, *> -> enslave(result as ListModeling<LIST, VALUE>)
+                else -> values = result as LIST
             }
         } catch(e: Throwable) {
             valid = false
@@ -166,11 +152,6 @@ interface SelfLoadableListModeling<LIST, MODEL_TYPE> : ListModeling<LIST, MODEL_
         }
 
         completion(this, null)
-    }
-
-    override fun invalidate() {
-        dataLoader.interrupt()
-        super.invalidate()
     }
 }
 

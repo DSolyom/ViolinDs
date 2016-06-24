@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ds.violin.v1.datasource.dataloading
+package ds.violin.v1.datasource.base
 
 import android.os.Handler
 import android.util.Log
@@ -108,10 +108,10 @@ class SingleUseBackgroundWorkerThread(dataLoader: BackgroundDataLoading, loadId:
             }
 
             handler?.post {
-                if (!interrupted && dataLoader != null) {
+                if (!interrupted) {
 
                     // 'send' result/error
-                    dataLoader!!.onDataLoaded()
+                    dataLoader?.onDataLoaded()
                 }
             }
         })

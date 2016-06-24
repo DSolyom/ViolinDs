@@ -16,14 +16,14 @@
 
 package ds.violin.v1.datasource
 
-import ds.violin.v1.datasource.dataloading.BackgroundDataLoading
-import ds.violin.v1.datasource.dataloading.SingleUseBackgroundWorkerThread
+import ds.violin.v1.datasource.base.BackgroundDataLoading
+import ds.violin.v1.datasource.base.SingleUseBackgroundWorkerThread
 import java.util.*
 
 /**
  * the most basic setup for a [BackgroundDataLoading] without the actual implementation of [load]
  */
-abstract class AbsBackgroundDataLoader(loadId: String? = null) : BackgroundDataLoading {
+abstract class BackgroundDataLoader(loadId: String? = null) : BackgroundDataLoading {
 
     override val loadId: String? = loadId
     override var worker: SingleUseBackgroundWorkerThread? = null

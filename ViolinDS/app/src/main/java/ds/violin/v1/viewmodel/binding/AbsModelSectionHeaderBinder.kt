@@ -22,22 +22,23 @@ import android.view.ViewGroup
 import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.viewmodel.binding.ModelViewBinding
+import ds.violin.v1.widget.adapter.SectionInfo
 
 /**
- * [AbsModelRowBinder] is the [ModelViewBinding] for an [AbsHeaderedAdapter]'s row
+ * [AbsModelSectionHeaderBinder] is the [ModelViewBinding] for a [SectionAdapter]'s section header
  *
- * @use implement [ModelViewBinding.bind] as you would in any other bindings, but remember, it could
- *      be working with a recycled (already filled) view from another row
+ * @use implement [ModelViewBinding.bind] as you would in any other bindings, but with section info
+ *      and remember, it could be working with a recycled (already filled) view from another item
  */
-abstract class AbsModelRowBinder(on: PlayingViolin, parent: ViewGroup, rowLayoutResID: Int = 0) :
-        RecyclerView.ViewHolder( { on.inflate(rowLayoutResID, parent, false) }() ), ModelViewBinding<Modeling<*>> {
+abstract class AbsModelSectionHeaderBinder(on: PlayingViolin, parent: ViewGroup, rowLayoutResID: Int = 0) :
+        RecyclerView.ViewHolder( { on.inflate(rowLayoutResID, parent, false) }() ), ModelViewBinding<Modeling<*, *>> {
 
     override var on: PlayingViolin = on
     override var rootView: View = itemView
 
-    abstract fun bind(model: Modeling<*>, position: Int)
+    abstract fun bind(model: SectionInfo, section: Int)
 
-    override fun bind(model: Modeling<*>) {
+    override fun bind(model: Modeling<*, *>) {
         throw UnsupportedOperationException()
     }
 }

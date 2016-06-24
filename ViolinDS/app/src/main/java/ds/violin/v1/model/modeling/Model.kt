@@ -24,34 +24,34 @@ import org.json.simple.JSONValue
 import java.io.Serializable
 import java.util.*
 
-interface GetSetModeling {
+interface GetSetModeling<VALUE> {
 
     fun has(key: String): Boolean
-    operator fun get(key: String): Any?
-    fun put(key: String, value: Any?)
+    operator fun get(key: String): VALUE?
+    fun put(key: String, value: VALUE?)
 
     fun remove(key: String) {
         put(key, null)
     }
 }
 
-interface Modeling<T> : GetSetModeling {
+interface Modeling<T, VALUE> : GetSetModeling<VALUE> {
 
     var values: T?
 
 }
 
-interface IterableModeling<T> : Modeling<T>, Iterable<Any?> {
+interface IterableModeling<T, VALUE> : Modeling<T, VALUE>, Iterable<Any?> {
 
 }
 
-interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>> {
+interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>, VALUE> {
 
-    override fun get(key: String): Any? {
+    override fun get(key: String): VALUE? {
         return values!![key]
     }
 
-    override fun put(key: String, value: Any?) {
+    override fun put(key: String, value: VALUE?) {
         if (value == null) {
             values!!.remove(key)
         } else {
@@ -72,7 +72,7 @@ interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>> {
     }
 }
 
-interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData, Serializable {
+interface JSONModeling : IterableModeling<JSONObject, Any>, HasSerializableData, Serializable {
 
     override fun get(key: String): Any? {
         return values!![key]
@@ -106,7 +106,7 @@ interface JSONModeling : IterableModeling<JSONObject>, HasSerializableData, Seri
 /**
  *  !note: unsafe - only hold in local scope - cursorPosition may change
  */
-interface CursorModeling : Modeling<Cursor> {
+interface CursorModeling : Modeling<Cursor, Any> {
 
     var _cursorPosition: Int
 
@@ -183,7 +183,7 @@ open class SerializableMapModel(values: MutableMap<String, Serializable> = HashM
 }
 
 /**
- * [CursorModeling] used in [CursorEntity] and [CursorListModeling]
+ * [CursorModeling] used in [CursorEntity]
  */
 open class CursorModel(values: Cursor? = null, cursorPosition: Int = 0) : CursorModeling {
 
@@ -192,10 +192,15 @@ open class CursorModel(values: Cursor? = null, cursorPosition: Int = 0) : Cursor
             if (field != null && field != value && !field!!.isClosed) {
                 field!!.close()
             }
+            value?.moveToPosition(_cursorPosition)
             field = value
         }
 
     override var _cursorPosition: Int = cursorPosition
+        set(value) {
+            values?.moveToPosition(value)
+            field = value
+        }
 
     init {
         values?.moveToPosition(_cursorPosition)

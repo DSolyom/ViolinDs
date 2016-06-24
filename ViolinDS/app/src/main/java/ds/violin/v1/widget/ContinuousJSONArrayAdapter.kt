@@ -19,10 +19,10 @@ package ds.violin.v1.widget
 import android.os.Parcel
 import android.os.Parcelable
 import ds.violin.v1.app.violin.PlayingViolin
-import ds.violin.v1.datasource.AbsBackgroundDataLoader
+import ds.violin.v1.datasource.BackgroundDataLoader
 import ds.violin.v1.model.entity.ContinuousListDataLoading
 import ds.violin.v1.model.entity.ContinuousMutableListing
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.modeling.JSONModel
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.util.common.Debug
@@ -67,7 +67,7 @@ class ContinuousJSONArrayAdapterDataParcelable(modelsString: String, offset: Int
  * an adapter for loading a list continuously as scrolling which uses a [JSONArrayAdapter] as base
  * and a [ContinuousMutableListing] with [JSONArray] and [JSONObject] to load and hold the data
  *
- * !note: the adapter's [dataLoader] should be a [AbsBackgroundDataLoader] and [ContinuousListDataLoading]
+ * !note: the adapter's [dataLoader] should be a [BackgroundDataLoader] and [ContinuousListDataLoading]
  */
 abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
         JSONArrayAdapterEntity(on, dataLoader, models), ContinuousMutableListing<JSONArray, JSONObject> {
@@ -85,7 +85,7 @@ abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoa
      * call 'get' with a completion block which notifies about range insertion or removal
      * to load the list continuously
      */
-    override fun getRowDataModel(dataPosition: Int): Modeling<*> {
+    override fun getItemDataModel(dataPosition: Int, section: Int): Modeling<*, *> {
         return JSONModel(get(dataPosition, { entity, error ->
             if (error == null) {
                 val newItemsAdded = sizeChange + offsetChange
@@ -106,11 +106,11 @@ abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoa
     }
 
     override fun dataToParcelable(): Parcelable {
-        return ContinuousJSONArrayAdapterDataParcelable(models.toString(), offset)
+        return ContinuousJSONArrayAdapterDataParcelable(values.toString(), offset)
     }
 
     override fun createDataFrom(parcelableData: Parcelable) {
-        models = JSONValue.parse((parcelableData as ContinuousJSONArrayAdapterDataParcelable).modelsString) as JSONArray
+        values = JSONValue.parse((parcelableData as ContinuousJSONArrayAdapterDataParcelable).modelsString) as JSONArray
         offset = parcelableData.offset
     }
 }

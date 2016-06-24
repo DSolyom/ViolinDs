@@ -9,6 +9,7 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.support.v4.content.res.ResourcesCompat
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.Animation
@@ -264,7 +265,7 @@ interface LazyLoadingImageView {
             if (originalVisibility == View.VISIBLE) {
                 (this as ImageView).visibility = View.VISIBLE
             }
-            (this as ImageView).setImageDrawable(resources.getDrawable(defaultResID, null))
+            (this as ImageView).setImageDrawable(ResourcesCompat.getDrawable(resources, defaultResID, null))
 
             if (defaultIsAnimated) {
                 AnimationStarter.start(this)
@@ -285,7 +286,7 @@ interface LazyLoadingImageView {
         if (originalVisibility == View.VISIBLE) {
             (this as ImageView).visibility = View.VISIBLE
         }
-        (this as ImageView).setImageDrawable(resources.getDrawable(loadingResID, null))
+        (this as ImageView).setImageDrawable(ResourcesCompat.getDrawable(resources, loadingResID, null))
 
         if (loadingIsAnimated) {
             AnimationStarter.start(this)
@@ -305,7 +306,7 @@ interface LazyLoadingImageView {
         if (originalVisibility == View.VISIBLE) {
             (this as ImageView).visibility = View.VISIBLE
         }
-        (this as ImageView).setImageDrawable(resources.getDrawable(errorResID, null))
+        (this as ImageView).setImageDrawable(ResourcesCompat.getDrawable(resources, errorResID, null))
 
         if (errorIsAnimated) {
             AnimationStarter.start(this)
@@ -352,18 +353,18 @@ interface LazyLoadingImageView {
                 if (matrix.isIdentity) {
                     drawMatrix = null
                 } else {
-                    drawMatrix = matrix
+                    drawMatrix = Matrix(matrix)
                 }
             } else if (fits) {
 
                 drawMatrix = null
             } else if (ImageView.ScaleType.CENTER == scaleType) {
 
-                drawMatrix = matrix
+                drawMatrix = Matrix(matrix)
                 drawMatrix!!.setTranslate(Math.round((vwidth - dwidth) * 0.5f).toFloat(),
                         Math.round((vheight - dheight) * 0.5f).toFloat())
             } else if (ImageView.ScaleType.CENTER_CROP == scaleType) {
-                drawMatrix = matrix
+                drawMatrix = Matrix(matrix)
 
                 val scale: Float
                 var dx = 0f
@@ -380,7 +381,7 @@ interface LazyLoadingImageView {
                 drawMatrix!!.setScale(scale, scale)
                 drawMatrix.postTranslate(Math.round(dx).toFloat(), Math.round(dy).toFloat())
             } else if (ImageView.ScaleType.CENTER_INSIDE == scaleType) {
-                drawMatrix = matrix
+                drawMatrix = Matrix(matrix)
                 val scale: Float
                 val dx: Float
                 val dy: Float
@@ -404,7 +405,7 @@ interface LazyLoadingImageView {
                 tempSrc.set(0f, 0f, dwidth.toFloat(), dheight.toFloat())
                 tempDst.set(0f, 0f, vwidth.toFloat(), vheight.toFloat())
 
-                drawMatrix = matrix
+                drawMatrix = Matrix(matrix)
 
                 val scaleToFit = when (scaleType) {
                     ImageView.ScaleType.FIT_START -> Matrix.ScaleToFit.START

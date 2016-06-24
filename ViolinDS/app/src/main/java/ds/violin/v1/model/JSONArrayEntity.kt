@@ -18,7 +18,7 @@ package ds.violin.v1.model
 
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.model.entity.SelfLoadableListModeling
-import ds.violin.v1.datasource.dataloading.DataLoading
+import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.modeling.JSONArrayListModel
 import ds.violin.v1.model.modeling.JSONArrayListModeling
 import org.json.simple.JSONArray
@@ -28,10 +28,10 @@ import java.io.Serializable
 /**
  * list entity holding it's data in a [JSONArray]
  */
-open class JSONArrayEntity(models: JSONArray = JSONArray()) :
+open class JSONArrayEntity(dataLoader: DataLoading, models: JSONArray = JSONArray()) :
         JSONArrayListModel(models), SelfLoadableListModeling<JSONArray, JSONObject> {
 
-    override lateinit var dataLoader: DataLoading
+    override var dataLoader: DataLoading = dataLoader
     override var valid: Boolean = false
     override var interrupted: Boolean = false
 }

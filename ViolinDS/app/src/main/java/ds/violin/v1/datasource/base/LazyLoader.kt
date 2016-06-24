@@ -14,11 +14,11 @@
 	limitations under the License.
 */
 
-package ds.violin.v1.datasource.dataloading
+package ds.violin.v1.datasource.base
 
 import android.os.Handler
 import ds.violin.v1.util.common.Debug
-import ds.violin.v1.datasource.dataloading.Interruptable
+import ds.violin.v1.datasource.base.Interruptable
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor

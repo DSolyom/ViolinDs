@@ -67,6 +67,9 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
     val searchRunnable = Runnable { startSearch() }
     val searchDelay = 500L
 
+    override val parentCanHoldHeader: Boolean = false
+    override val parentCanHoldFooter: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super<FullScreenDialog>.onCreate(savedInstanceState)
         super<ViolinRecyclerViewFragment>.onCreate(savedInstanceState)
@@ -308,7 +311,7 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
 
     open class PlayBinder(on: PlayingViolin, view: View) : AbsModelViewBinder(on, view) {
 
-        override fun bind(model: Modeling<*>?) {
+        override fun bind(model: Modeling<*, *>?) {
             (on as AbsSearchFakeActionView).searchEditText.addTextChangedListener(
                     object : android.text.TextWatcher {
                         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {

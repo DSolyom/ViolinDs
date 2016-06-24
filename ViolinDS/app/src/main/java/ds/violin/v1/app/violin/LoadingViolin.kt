@@ -24,7 +24,7 @@ import ds.violin.v1.Global
 import ds.violin.v1.model.entity.HasParcelableData
 import ds.violin.v1.model.entity.HasSerializableData
 import ds.violin.v1.model.entity.SelfLoadable
-import ds.violin.v1.datasource.dataloading.BackgroundDataLoading
+import ds.violin.v1.datasource.base.BackgroundDataLoading
 import java.io.Serializable
 import java.util.*
 

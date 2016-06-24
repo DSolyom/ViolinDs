@@ -24,8 +24,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import ds.violin.v1.app.violin.RecyclerViewViolin
-import ds.violin.v1.viewmodel.AbsModelRowBinder
+import ds.violin.v1.viewmodel.AbsModelRecyclerViewItemBinder
 import ds.violin.v1.widget.adapter.AbsHeaderedAdapter
+import ds.violin.v1.widget.adapter.SectionedAdapter
 
 /**
  * Sticky section headers for [IRecyclerView] with [LinearLayoutManager] and [AbsHeaderedAdapter]
@@ -60,8 +61,8 @@ open class StickyHeader : FrameLayout {
     /** */
     lateinit var onScroll: RecyclerView.OnScrollListener
 
-    /** the [AbsModelRowBinder] for the header */
-    var headerBinder: AbsModelRowBinder? = null
+    /** the [AbsModelRecyclerViewItemBinder] for the header */
+    var headerBinder: AbsModelRecyclerViewItemBinder? = null
         set(value) {
             field = value
             if (field != null) {
@@ -93,8 +94,8 @@ open class StickyHeader : FrameLayout {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val adapter = recyclerView.adapter ?: return
-                if (adapter !is AbsHeaderedAdapter<*, *>) {
-                    throw UnsupportedOperationException("StickyHeader only works with AbsHeaderedAdapter")
+                if (adapter !is SectionedAdapter) {
+                    throw UnsupportedOperationException("StickyHeader only works with SectionedAdapter")
                 }
                 val layoutManager = recyclerView.layoutManager ?: return
                 if (layoutManager !is LinearLayoutManager) {
@@ -116,16 +117,16 @@ open class StickyHeader : FrameLayout {
 
                         /** set new section */
                         currentSection = section
-                        val sectionStart = adapter.sectionList[section]
+                        val sectionStart = adapter.sectionPositions[section]
 
                         /** get same (type) binder from the adapter as the section's header's */
                         headerBinder = adapter.onCreateViewHolder(sh,
-                                adapter.getSectionHeaderViewType(sectionStart)) as AbsModelRowBinder
+                                adapter.getSectionHeaderViewType(sectionStart)) as AbsModelRecyclerViewItemBinder
 
                         /** add the sticky header view */
                         removeAllViewsInLayout()
                         addView(headerBinder!!.rootView)
-                        headerBinder!!.bind(adapter.sections[sectionStart]!!)
+                        headerBinder!!.bind(adapter.sectionInfos[section]!!)
                         val rootView = headerBinder!!.rootView
                         val lp = rootView.layoutParams as FrameLayout.LayoutParams
                         if (lp.bottomMargin < 0) {
@@ -148,7 +149,7 @@ open class StickyHeader : FrameLayout {
 
                 }
 
-                if (adapter.sections.containsKey(firstPosition)) {
+                if (adapter.sectionPositions.contains(firstPosition)) {
 
                     /** first section should now be invisible not to see double of it */
                     recyclerView.getChildAt(0).visibility = View.INVISIBLE
@@ -156,7 +157,7 @@ open class StickyHeader : FrameLayout {
 
                 /** the rest of the headers' visibility should be restored */
                 for (i in 1..recyclerView.childCount-1) {
-                    if (adapter.sections.containsKey(firstPosition + i)) {
+                    if (adapter.sectionPositions.contains(firstPosition + i)) {
                         recyclerView.getChildAt(i).visibility = View.VISIBLE
                     }
                 }
@@ -166,7 +167,7 @@ open class StickyHeader : FrameLayout {
                     /** create 'push out' effect */
                     val rootView = headerBinder!!.rootView
                     val lp = rootView.layoutParams as FrameLayout.LayoutParams
-                    if (recyclerView.childCount > 1 && adapter.sections.containsKey(firstPosition + 1)) {
+                    if (recyclerView.childCount > 1 && adapter.sectionPositions.contains(firstPosition + 1)) {
                         val secondPos = recyclerView.getChildAt(1).top
                         lp.topMargin = Math.min(0, secondPos - rootView.measuredHeight)
                     } else {
@@ -186,7 +187,7 @@ open class IRecyclerView : RecyclerView {
         set(headerView) {
             field = headerView
             val adapter = adapter
-            if (adapter != null && adapter is AbsHeaderedAdapter<*, *>) {
+            if (adapter != null && adapter is AbsHeaderedAdapter) {
                 adapter.headerView = field
             }
         }
@@ -196,7 +197,7 @@ open class IRecyclerView : RecyclerView {
         set(footerView) {
             field = footerView
             val adapter = adapter
-            if (adapter != null && adapter is  AbsHeaderedAdapter<*, *>) {
+            if (adapter != null && adapter is  AbsHeaderedAdapter) {
                 adapter.footerView = field
             }
         }
@@ -217,7 +218,7 @@ open class IRecyclerView : RecyclerView {
             return
         }
 
-        if (adapter is AbsHeaderedAdapter<*, *>) {
+        if (adapter is AbsHeaderedAdapter) {
 
             /** set [adapter.headerView] and [adapter.footerView] if those were here before the adapter */
             adapter.headerView = headerView

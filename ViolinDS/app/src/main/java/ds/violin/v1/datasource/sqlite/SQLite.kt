@@ -177,23 +177,22 @@ interface SQLiteQueryExecuting : RequestExecuting<SQLiteQueryParams, SQLiteDatab
     }
 }
 
-interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, Int?> {
+interface SQLiteModelDataExecuting : RequestExecuting<Any, SQLiteDatabase, Int?>
+
+open class SQLiteStatementExecutor {
 
     enum class Method {
         INSERT, INSERT_UPDATE, UPDATE, OVERWRITE
     }
 
     /** method of the execution */
-    var method: Method
+    open var method = SQLiteStatementExecutor.Method.INSERT_UPDATE
 
-    /** lateinit - #Private */
-    var columns: Array<Column?>
-    /** =0 - #Private */
-    var columnCount: Int
-    /** #Private */
-    var insertStatement: SQLiteStatement?
-    /** #Private */
-    var updateStatement: SQLiteStatement?
+    lateinit var columns: Array<Column?>
+    var columnCount: Int = 0
+
+    var insertStatement: SQLiteStatement? = null
+    var updateStatement: SQLiteStatement? = null
 
     /**
      * currently only supporting insert or update
@@ -201,7 +200,7 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
      * @param target
      * @param model
      */
-        fun createStatements(target: Table, model: IterableModeling<*>, recipient: SQLiteDatabase) {
+    fun createStatements(target: Table, model: IterableModeling<*, *>, recipient: SQLiteDatabase) {
 
         val columns = target.columns
 
@@ -215,7 +214,7 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
         var hasUnique = false
 
         for (column in columns) {
-            if ((column.type and Column.JOINED_TABLE) > 0 || !model.has(column.name)) {
+            if ((column.type and (Column.JOINED_TABLE or Column.VS_TABLE)) > 0 || !model.has(column.name)) {
                 continue
             }
 
@@ -228,7 +227,7 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
         var last = columnCount;
 
         for (column in columns) {
-            if ((column.type and Column.JOINED_TABLE) > 0 || !model.has(column.name)) {
+            if ((column.type and (Column.JOINED_TABLE or Column.VS_TABLE)) > 0 || !model.has(column.name)) {
                 continue;
             }
 
@@ -261,7 +260,7 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
             insertStatement = null
         }
 
-        if (hasUnique && method != Method.INSERT) {
+        if (hasUnique && method != Method.INSERT && updateSet.length > 0) {
             updateStatement = recipient.compileStatement("UPDATE " + target.name + " SET " +
                     updateSet.substring(1) + " WHERE " + updateWhere.substring(1));
         } else {
@@ -272,11 +271,11 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
     /**
      * bind model data to the [insertStatement] and [updateStatement]
      *
-     * @param table
+     * @param target
      * @param model
      * @return
      */
-    open fun bind(target: Table, model: IterableModeling<*>): Any? {
+    open fun bind(target: Table, model: IterableModeling<*, *>): Any? {
 
         // in case previous one was simple insert
         if (updateStatement != null) {
@@ -296,15 +295,17 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
 
                 val columnName = columns[i]!!.name
                 type = columns[i]!!.type
-                value = model.get(columnName)
+                value = model[columnName]
 
                 if ((value == null && model.has(columnName) || method == Method.OVERWRITE)
                         && (type and Column.NULL) > 0) {
-                    insertStatement!!.bindNull(i + 1);
-                    if (updateStatement != null) {
-                        updateStatement!!.bindNull(i + 1);
+                    if (insertStatement != null) {
+                        insertStatement!!.bindNull(i + 1)
                     }
-                    // Debug.logD("JSONToDb", "binding null for " + mColumns[i].name);
+                    if (updateStatement != null) {
+                        updateStatement!!.bindNull(i + 1)
+                    }
+                    // Debug.logD("JSONToDb", "binding null for " + mColumns[i].name)
                     continue;
                 }
                 if (value == null) {
@@ -357,7 +358,9 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
                     is Long -> value.toLong()
                     else -> throw ClassCastException("value '$value' could not be cast to Long")
                 }
-                insertStatement!!.bindLong(position + 1, longValue)
+                if (insertStatement != null) {
+                    insertStatement!!.bindLong(position + 1, longValue)
+                }
                 if (updateStatement != null) {
                     updateStatement!!.bindLong(position + 1, longValue)
                 }
@@ -371,7 +374,9 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
                 if (value) {
                     longValue = 1L
                 }
-                insertStatement!!.bindLong(position + 1, longValue)
+                if (insertStatement != null) {
+                    insertStatement!!.bindLong(position + 1, longValue)
+                }
                 if (updateStatement != null) {
                     updateStatement!!.bindLong(position + 1, longValue)
                 }
@@ -386,21 +391,25 @@ interface SQLiteModelStatementExecuting : RequestExecuting<Any, SQLiteDatabase, 
                     is Float -> value.toDouble()
                     else -> throw ClassCastException("value '$value' could not be cast to Double")
                 }
-                insertStatement!!.bindDouble(position + 1, doubleValue)
+                if (insertStatement != null) {
+                    insertStatement!!.bindDouble(position + 1, doubleValue)
+                }
                 if (updateStatement != null) {
                     updateStatement!!.bindDouble(position + 1, doubleValue)
                 }
             }
 
             else -> {
-                insertStatement!!.bindString(position + 1, value.toString())
+                if (insertStatement != null) {
+                    insertStatement!!.bindString(position + 1, value.toString())
+                }
                 if (updateStatement != null) {
                     updateStatement!!.bindString(position + 1, value.toString())
                 }
             }
         }
 
-        // Debug.logD("JSONToDb", "binded " + value + " for " + mColumns[i].name);
+        // Debug.logD("JSONToDb", "binded " + value + " for " + mColumns[i].name)
     }
 
     /**
