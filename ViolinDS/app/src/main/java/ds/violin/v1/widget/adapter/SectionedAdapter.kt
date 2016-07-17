@@ -23,7 +23,7 @@ import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.model.modeling.SerializableMapModel
 import ds.violin.v1.util.common.Debug
 import ds.violin.v1.viewmodel.AbsModelRecyclerViewItemBinder
-import ds.violin.v1.viewmodel.AbsModelSectionHeaderBinder
+import ds.violin.v1.viewmodel.AbsModelSectionBinder
 import ds.violin.v1.viewmodel.binding.ModelViewBinding
 import java.util.*
 
@@ -70,15 +70,6 @@ interface SectionedAdapter {
     }
 
     /**
-     * return section 'offset' for [position] - this is the offset to be added to data position to get
-     * real list position or subtract from list position to get real data position (without counting the header)
-     */
-    fun sectionOffsetFor(position: Int): Int {
-        val section = sectionFor(position) ?: return 0
-        return section + 1
-    }
-
-    /**
      * return real item view type for given !data! position and section
      *
      * !note: meaning of the dataPosition may differ in implementation
@@ -88,9 +79,9 @@ interface SectionedAdapter {
     }
 
     /**
-     * return section view type for given !list! position
+     * return section view type for given section position
      */
-    fun getSectionHeaderViewType(position: Int): Int {
+    fun getSectionViewType(section: Int): Int {
         return AbsHeaderedAdapter.VIEWTYPE_SECTION_HEADER
     }
 }
@@ -112,27 +103,27 @@ abstract class AbsMultiDataAdapter(on: PlayingViolin,
     override var sectionPositions = ArrayList<Int>()
 
     override fun getRealItemViewType(position: Int): Int {
-        val section = sectionOffsetFor(position)
+        val section = sectionFor(position) ?: -1    // it's never -1
         if (sectionPositions.contains(position)) {
 
             /** section header requires section header view type */
-            return getSectionHeaderViewType(section)
+            return getSectionViewType(section!!)
         } else {
 
             /** normal item - [getItemViewType]s position is the position in the item's section */
-            val dataPosition = position - sectionPositions[section] - 1
+            var dataPosition = position - sectionPositions[section] - 1
             return getItemViewType(dataPosition, section)
         }
     }
 
     override fun onBindViewHolder(binder: AbsModelRecyclerViewItemBinder, position: Int) {
         try {
-            val section = sectionOffsetFor(position)
+            val section = sectionFor(position) ?: -1    // it's never -1
             if (sectionPositions.contains(position)) {
 
                 /** section header */
                 when (binder) {
-                    is AbsModelSectionHeaderBinder -> binder.bind(sectionInfos[section], section)
+                    is AbsModelSectionBinder -> binder.bind(sectionInfos[section], section)
                     is AbsModelRecyclerViewItemBinder -> binder.bind(sectionInfos[section], position, section)
                     else -> (binder as ModelViewBinding<Modeling<*, *>>).bind(sectionInfos[section]!!)
                 }

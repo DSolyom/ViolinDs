@@ -16,6 +16,12 @@
         <item name="android:actionMenuTextColor">@color/actionbar_text</item>
         <item name="android:actionBarWidgetTheme">@style/Theme.App.ActionBar.Widget</item>
         <item name="android:textColorPrimary">@color/actionbar_title</item>
+        <item name="android:actionOverflowButtonStyle">@style/overflowButtonStyle</item>
+        <item name="actionOverflowButtonStyle">@style/overflowButtonStyle</item>
+    </style>
+
+    <style name="overflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_action_overflow</item>
     </style>
 
     <style name="Theme.App.Popup" parent="Theme.AppCompat.Light.NoActionBar">

@@ -21,7 +21,7 @@ import ds.violin.v1.model.modeling.ListModeling
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.util.common.Debug
 import ds.violin.v1.viewmodel.AbsModelRecyclerViewItemBinder
-import ds.violin.v1.viewmodel.AbsModelSectionHeaderBinder
+import ds.violin.v1.viewmodel.AbsModelSectionBinder
 import ds.violin.v1.viewmodel.binding.ModelViewBinding
 import java.io.Serializable
 import java.util.*
@@ -71,32 +71,32 @@ abstract class AbsListModelingAdapter<LIST, VALUE>(on: PlayingViolin) :
     }
 
     override fun getRealItemViewType(position: Int): Int {
-        val section = sectionOffsetFor(position)
+        val section = sectionFor(position) ?: -1
         if (sectionPositions.contains(position)) {
 
             /** section header requires section header view type */
-            return getSectionHeaderViewType(section)
+            return getSectionViewType(section)
         } else {
 
             /** normal item - [getItemViewType]s position is the item's position in the data */
-            return getItemViewType(position - section, section)
+            return getItemViewType(position - section + 1, section)
         }
     }
 
     override fun onBindViewHolder(binder: AbsModelRecyclerViewItemBinder, position: Int) {
         try {
-            val section = sectionOffsetFor(position)
+            val section = sectionFor(position) ?: -1
             if (sectionPositions.contains(position)) {
 
                 /** section header */
                 when (binder) {
-                    is AbsModelSectionHeaderBinder -> binder.bind(sectionInfos[section], section)
+                    is AbsModelSectionBinder -> binder.bind(sectionInfos[section], section)
                     is AbsModelRecyclerViewItemBinder -> binder.bind(sectionInfos[section], position, section)
                     else -> (binder as ModelViewBinding<Modeling<*, *>>).bind(sectionInfos[section]!!)
                 }
             } else {
                 /** normal data - [getItemViewType]'s and [binder]'s position is the item's position in the data */
-                val dataPosition = position - section
+                val dataPosition = position - section + 1
                 val rowDataModel = getItemDataModel(dataPosition, section)
                 if (binder is AbsModelRecyclerViewItemBinder) {
                     binder.bind(rowDataModel, dataPosition, section)

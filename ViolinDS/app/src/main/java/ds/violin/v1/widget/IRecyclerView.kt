@@ -117,11 +117,10 @@ open class StickyHeader : FrameLayout {
 
                         /** set new section */
                         currentSection = section
-                        val sectionStart = adapter.sectionPositions[section]
 
                         /** get same (type) binder from the adapter as the section's header's */
                         headerBinder = adapter.onCreateViewHolder(sh,
-                                adapter.getSectionHeaderViewType(sectionStart)) as AbsModelRecyclerViewItemBinder
+                                adapter.getSectionViewType(section)) as AbsModelRecyclerViewItemBinder
 
                         /** add the sticky header view */
                         removeAllViewsInLayout()

@@ -258,6 +258,8 @@ interface ActivityViolin : PlayingViolin {
             removeSavedTransportData()
             activityRequestCode = requestCode
             onEnter(data)
+        } else {
+            onActivityResult(requestCode, resultCode, null as Any?)
         }
     }
 

@@ -213,7 +213,7 @@ interface RecyclerViewViolin {
      */
     fun toggleEmptyViewVisibility() {
         if (emptyView != null) {
-            emptyView!!.visibility = when (shouldShowEmpty()) {
+            emptyView!!.visibility = when (isListEmpty()) {
                 true -> View.VISIBLE
                 false -> View.GONE
             }
@@ -225,7 +225,7 @@ interface RecyclerViewViolin {
      *
      * @param return
      */
-    fun shouldShowEmpty(): Boolean {
+    fun isListEmpty(): Boolean {
         return (adapter !is SelfLoadable || (adapter as SelfLoadable).valid) && adapter!!.itemCount == 0
     }
 

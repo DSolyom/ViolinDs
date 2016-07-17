@@ -212,15 +212,23 @@ interface LoadingViolin {
      */
     @Suppress("UNCHECKED_CAST")
     fun restoreInstanceState(savedInstanceState: Bundle) {
-        /** saved states - only contains [Serializable] at this point */
-        savedStates = savedInstanceState.getSerializable(SAVED_STATES) as HashMap<String, Any>
-        /** ids of entities that were loading at [saveInstanceState] */
-        idsOfLoaded = savedInstanceState.getStringArrayList(IDS_OF_LOADED)
+        try {
 
-        /** saved parcelable data ids - put parcelable data in saved states too according to these */
-        idsOfParcelable = savedInstanceState.getStringArrayList(IDS_OF_PARCELABLE)
-        for (id in idsOfParcelable) {
-            savedStates.put(id, savedInstanceState.getParcelable(STATE_PREFIX + id))
+            /** saved states - only contains [Serializable] at this point */
+            savedStates = savedInstanceState.getSerializable(SAVED_STATES) as HashMap<String, Any>
+
+            /** ids of entities that were loading at [saveInstanceState] */
+            idsOfLoaded = savedInstanceState.getStringArrayList(IDS_OF_LOADED)
+
+            /** saved parcelable data ids - put parcelable data in saved states too according to these */
+            idsOfParcelable = savedInstanceState.getStringArrayList(IDS_OF_PARCELABLE)
+            for (id in idsOfParcelable) {
+                savedStates.put(id, savedInstanceState.getParcelable(STATE_PREFIX + id))
+            }
+        } catch(err: Throwable) {
+            savedStates = HashMap()
+            idsOfLoaded = ArrayList<String>()
+            idsOfParcelable = ArrayList<String>()
         }
     }
 

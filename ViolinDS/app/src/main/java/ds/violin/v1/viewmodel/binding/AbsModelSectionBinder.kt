@@ -25,12 +25,12 @@ import ds.violin.v1.viewmodel.binding.ModelViewBinding
 import ds.violin.v1.widget.adapter.SectionInfo
 
 /**
- * [AbsModelSectionHeaderBinder] is the [ModelViewBinding] for a [SectionAdapter]'s section header
+ * [AbsModelSectionBinder] is the [ModelViewBinding] for a [SectionAdapter]'s section header
  *
  * @use implement [ModelViewBinding.bind] as you would in any other bindings, but with section info
  *      and remember, it could be working with a recycled (already filled) view from another item
  */
-abstract class AbsModelSectionHeaderBinder(on: PlayingViolin, parent: ViewGroup, rowLayoutResID: Int = 0) :
+abstract class AbsModelSectionBinder(on: PlayingViolin, parent: ViewGroup, rowLayoutResID: Int = 0) :
         RecyclerView.ViewHolder( { on.inflate(rowLayoutResID, parent, false) }() ), ModelViewBinding<Modeling<*, *>> {
 
     override var on: PlayingViolin = on
