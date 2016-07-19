@@ -79,7 +79,7 @@ abstract class AbsListModelingAdapter<LIST, VALUE>(on: PlayingViolin) :
         } else {
 
             /** normal item - [getItemViewType]s position is the item's position in the data */
-            return getItemViewType(position - section + 1, section)
+            return getItemViewType(position - (section + 1), section)
         }
     }
 
@@ -96,7 +96,7 @@ abstract class AbsListModelingAdapter<LIST, VALUE>(on: PlayingViolin) :
                 }
             } else {
                 /** normal data - [getItemViewType]'s and [binder]'s position is the item's position in the data */
-                val dataPosition = position - section + 1
+                val dataPosition = position - (section + 1)
                 val rowDataModel = getItemDataModel(dataPosition, section)
                 if (binder is AbsModelRecyclerViewItemBinder) {
                     binder.bind(rowDataModel, dataPosition, section)
