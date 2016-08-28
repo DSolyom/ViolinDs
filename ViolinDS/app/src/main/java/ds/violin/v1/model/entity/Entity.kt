@@ -79,6 +79,10 @@ interface SelfLoadable : Interruptable {
         dataLoader.interrupt()
         super.interrupt()
     }
+
+    fun isLoading(): Boolean {
+        return dataLoader.loading
+    }
 }
 
 /**

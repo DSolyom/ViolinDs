@@ -237,7 +237,8 @@ interface ViewBinding {
                 IMAGE_LAZY -> {
 
                     if (value == null || (value is String && value.length == 0)) {
-                        (view as LazyImageView).showDefault()
+                        (view as LazyImageView).stopLoading()
+                        view.showDefault()
                     } else if (value is String) {
                         (view as LazyImageView).loadImage(ImageDescriptor(value))
                     } else {

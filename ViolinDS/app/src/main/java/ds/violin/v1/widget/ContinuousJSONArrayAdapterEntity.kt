@@ -31,7 +31,7 @@ import org.json.simple.JSONObject
 import org.json.simple.JSONValue
 
 /**
- * Parcelable data for [ContinuousJSONArrayAdapter]
+ * Parcelable data for [ContinuousJSONArrayAdapterEntity]
  */
 class ContinuousJSONArrayAdapterDataParcelable(modelsString: String, offset: Int) : Parcelable {
 
@@ -69,7 +69,7 @@ class ContinuousJSONArrayAdapterDataParcelable(modelsString: String, offset: Int
  *
  * !note: the adapter's [dataLoader] should be a [BackgroundDataLoader] and [ContinuousListDataLoading]
  */
-abstract class ContinuousJSONArrayAdapter(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
+abstract class ContinuousJSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
         JSONArrayAdapterEntity(on, dataLoader, models), ContinuousMutableListing<JSONArray, JSONObject> {
 
     override var offset: Int = 0

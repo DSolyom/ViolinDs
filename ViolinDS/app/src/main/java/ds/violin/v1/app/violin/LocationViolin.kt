@@ -50,7 +50,7 @@ interface LocationViolin : LocationListener {
      * [Manifest.permission.ACCESS_COARSE_LOCATION],
      * [Manifest.permission.ACCESS_FINE_LOCATION]
      */
-    val requiredUserPermissions: Array<String>
+    val requiredLocationPermissions: Array<String>
 
     /** = null, last known location - or [currentLocation] if that is set */
     var lastKnownLocation: Location?
@@ -189,7 +189,7 @@ interface LocationViolin : LocationListener {
             // need to check manually if location settings are now enabled because resultCode could always be 0 on some devices
             var lm = ((this as PlayingViolin).violinActivity as Context).getSystemService(Context.LOCATION_SERVICE) as LocationManager
             var good = false
-            for (permission in requiredUserPermissions) {
+            for (permission in requiredLocationPermissions) {
                 good = good or when (permission) {
                     Manifest.permission.ACCESS_COARSE_LOCATION -> lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
                     Manifest.permission.ACCESS_FINE_LOCATION -> lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -220,7 +220,7 @@ interface LocationViolin : LocationListener {
             if (!checkedLocationSettings) {
                 (this as PlayingViolin).
                         askUserForPermission(ASK_PERMISSION_LOCATION,
-                                requiredUserPermissions) { permissions, grantResults ->
+                                requiredLocationPermissions) { permissions, grantResults ->
                             val success = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                             if (success) {
                                 startLocationRequests()

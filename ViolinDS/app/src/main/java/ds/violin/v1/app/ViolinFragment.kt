@@ -16,15 +16,15 @@
 
 package ds.violin.v1.app
 
-import android.app.Activity
-import android.app.DialogFragment
-import android.app.Fragment
+import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import ds.violin.v1.R
 import ds.violin.v1.app.violin.*
 import ds.violin.v1.model.entity.SelfLoadable
 import java.util.*
@@ -39,7 +39,9 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override lateinit var violinActivity: ActivityViolin
 
     override val registeredEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
+    override val registeredSituationalEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
     override val loadingEntities: MutableList<SelfLoadable> = ArrayList()
+    override var allDataLoadListener: LoadingViolin.AllDataLoadListener? = null
     override var savedStates: HashMap<String, Any> = HashMap()
     override var idsOfParcelable: ArrayList<String> = ArrayList()
     override var idsOfLoaded: ArrayList<String> = ArrayList()
@@ -76,6 +78,14 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override fun invalidateRegisteredEntities(subViolinsToo: Boolean) {
         super<LoadingViolin>.invalidateRegisteredEntities(subViolinsToo)
         super<FragmentViolin>.invalidateRegisteredEntities(subViolinsToo)
+    }
+
+    override fun getContext(): Context? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return super.getContext()
+        } else {
+            return violinActivity as Context?
+        }
     }
 
     override fun play() {

@@ -178,8 +178,8 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
         val fragmentDialog = fm.findFragmentByTag(tag) as DialogFragment?
 
         val dialog = fragmentDialog!!.dialog
-        if (dialog != null && !dialog.isShowing) {
-            fragmentDialog.dismiss();
+        if (dialog != null && dialog.isShowing) {
+            fragmentDialog.dismiss()
         }
     }
 
@@ -211,11 +211,11 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
         if (needRationale) {
             showRequestPermissionRationale(permissionPackId) {
                 requestPermissions(permissions)
-                requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
+                violinActivity.requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
             }
         } else if (needPermission) {
             requestPermissions(permissions)
-            requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
+            violinActivity.requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
         }
     }
 
@@ -261,7 +261,7 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
 
     /** ---------------------------------------------------------------------------------------- */
 
-    fun inflate(resource: Int, root: ViewGroup, attachToRoot: Boolean): View {
+    fun inflate(resource: Int, root: ViewGroup? = null, attachToRoot: Boolean = false): View {
         return (violinActivity as ViolinActivity).layoutInflater.inflate(resource, root, attachToRoot)
     }
 

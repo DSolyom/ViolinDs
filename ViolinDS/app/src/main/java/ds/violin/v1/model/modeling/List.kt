@@ -31,6 +31,7 @@ interface ListModeling<LIST, VALUE> {
 
     operator fun get(index: Int): VALUE?
 
+    fun add(value: VALUE)
     fun add(index: Int, value: VALUE)
     fun add(index: Int, value: Modeling<VALUE, Any>)
 
@@ -38,6 +39,8 @@ interface ListModeling<LIST, VALUE> {
     fun addAll(otherValues: LIST) {
         addAll(size, otherValues)
     }
+
+    fun contains(value: VALUE) : Boolean
 
     fun remove(index: Int, count: Int = 1)
 
@@ -57,12 +60,20 @@ interface MutableListModeling<VALUE> : ListModeling<MutableList<VALUE>, VALUE> {
             return values.size
         }
 
+    override fun add(value: VALUE) {
+        values.add(size, value)
+    }
+
     override fun add(index: Int, value: VALUE) {
         values.add(index, value)
     }
 
     override fun add(index: Int, value: Modeling<VALUE, Any>) {
         values.add(index, value.values!!)
+    }
+
+    override fun contains(value: VALUE) : Boolean {
+        return values.contains(value)
     }
 
     override fun remove(index: Int, count: Int) {
@@ -97,6 +108,10 @@ interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerial
         return values[index] as JSONObject
     }
 
+    override fun add(value: JSONObject) {
+        values.add(size, value)
+    }
+
     override fun add(index: Int, value: JSONObject) {
         val jsonArray = JSONArray()
         jsonArray.add(value)
@@ -107,6 +122,10 @@ interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerial
         val jsonArray = JSONArray()
         jsonArray.add(value.values)
         addAll(index, jsonArray)
+    }
+
+    override fun contains(value: JSONObject) : Boolean {
+        return values.contains(value)
     }
 
     override fun remove(index: Int, count: Int) {
@@ -173,13 +192,21 @@ interface CursorListModeling : ListModeling<CursorModel, Cursor> {
         }
 
     /**
-     *  !note: returned value is unsafe - only hold in local scope - __cursorindex may change
+     *  !note: returned value is unsafe - only hold in local scope - _cursorPosition may change
      *
      *  @return
      */
     override fun get(index: Int): Cursor? {
         values._cursorPosition = index
         return values.values
+    }
+
+    override fun contains(value: Cursor) : Boolean {
+        throw UnsupportedOperationException()
+    }
+
+    override fun add(value: Cursor) {
+        throw UnsupportedOperationException()
     }
 
     override fun add(index: Int, value: Cursor) {

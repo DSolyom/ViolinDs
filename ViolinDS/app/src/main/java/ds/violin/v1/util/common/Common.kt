@@ -513,7 +513,7 @@ fun formatNumberByCurrency(number: Any, currency: String, fractionDigits: Int): 
  * @return
  */
 fun formatNumberByCurrency(number: Any, currency: Currency): String {
-    return formatNumberByCurrency(number, currency, currency.getDefaultFractionDigits())
+    return formatNumberByCurrency(number, currency, currency.defaultFractionDigits)
 }
 
 /**
@@ -524,7 +524,7 @@ fun formatNumberByCurrency(number: Any, currency: Currency): String {
  */
 fun formatNumberByCurrency(number: Any, currency: Currency, fractionDigits: Int): String {
     val nf: NumberFormat
-    nf = NumberFormat.getInstance()
+    nf = NumberFormat.getCurrencyInstance()
     try {
         nf.currency = currency
         nf.minimumFractionDigits = fractionDigits
@@ -876,4 +876,12 @@ fun deserializeObject(b: ByteArray): Serializable? {
         error.printStackTrace();
         return null;
     }
+}
+
+fun textFromTextView(resID: Int, rootView: View): String? {
+    val textView = rootView.findViewById(resID)
+    if (textView is TextView) {
+        return textView.text.toString()
+    }
+    return null
 }

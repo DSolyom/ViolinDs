@@ -106,9 +106,12 @@ interface HttpSessionHandling : SessionHandling<HttpParams> {
         ParamsMerger<String, String>().merge(params.headers, state.headers)
         ParamsMerger<String, Any>().merge(params.getParams, state.getParams)
         when (params.postParams) {
-            is HashMap<*, *> ->
-                ParamsMerger<String, Any>().merge(params.postParams as HashMap<String, Any>,
-                        state.postParams as HashMap<String, Any>)
+            is HashMap<*, *> -> {
+                if (state.postParams != null) {
+                    ParamsMerger<String, Any>().merge(params.postParams as HashMap<String, Any>,
+                            state.postParams as HashMap<String, Any>)
+                }
+            }
             null -> params.postParams = state.postParams
         }
     }
@@ -141,6 +144,11 @@ interface HttpSessionHandling : SessionHandling<HttpParams> {
  */
 interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult> {
 
+    companion object {
+        const val CACHE_MODE_ALWAYS = 0
+        const val CACHE_MODE_ONLY_FOR_FAILURE = 1
+    }
+
     /** =null, #Private */
     var _postBodyStreamer: PostBodyStreamer?
     /** =null, #Private */
@@ -148,6 +156,8 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
 
     /** =null - cache for get responses */
     var externalResponseCache: Caching<RTPKey, String>?
+    /** =CACHE_MODE_ALWAYS or CACHE_MODE_ONLY_FOR_FAILURE or ... */
+    var externalResponseCacheMode: Int
 
     var connectionTimeout: Int
     var readTimeout: Int
@@ -158,17 +168,21 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
 
         val httpURLConnection: HttpURLConnection? = null
         var responseStream: InputStream?
+        var result: HttpResult? = null
+
+        val params = request.params as HttpParams
+        val getParams = GetSerializer().format(params) + params.fragment
+        val finalUrl = recipient + request.target + getParams
+
+        val httpMethod = getHttpMethodFor(request.method!!)
+
+        _responseReader = getResponseReader(request.resultFormat!!)
+
+
         try {
-            val params = request.params as HttpParams
-            val getParams = GetSerializer().format(params) + params.fragment
-            val finalUrl = recipient + request.target + getParams
-
-            val httpMethod = getHttpMethodFor(request.method!!)
-
-            _responseReader = getResponseReader(request.resultFormat!!)
 
             /** try cache for GET requests */
-            if (httpMethod == "GET" && externalResponseCache != null) {
+            if (httpMethod == "GET" && externalResponseCache != null && externalResponseCacheMode != CACHE_MODE_ONLY_FOR_FAILURE) {
 
                 val cachedResult = externalResponseCache!!.get(RTPKey(recipient, request.target as String, getParams))
                 if (cachedResult != null) {
@@ -202,8 +216,10 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
 
             /** set cookies */
             synchronized(params.cookieManager!!) {
-                connection.setRequestProperty("Cookie",
-                        TextUtils.join(";", params.cookieManager!!.cookieStore.cookies))
+                if (!params.cookieManager!!.cookieStore.cookies.isEmpty()) {
+                    connection.setRequestProperty("Cookie",
+                            TextUtils.join(";", params.cookieManager!!.cookieStore.cookies))
+                }
             }
 
             _postBodyStreamer = getPostBodyStreamer(request.method!!, params)
@@ -221,7 +237,7 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
             }
 
             /** server answer - status code */
-            val result = HttpResult(headers = HashMap())
+            result = HttpResult(headers = HashMap())
 
             try {
                 result.statusCode = connection.responseCode
@@ -286,6 +302,18 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
                 _responseReader?.interrupt()
                 httpURLConnection?.disconnect()
             } catch(_: Throwable) {
+            }
+
+            if (result != null && externalResponseCacheMode == CACHE_MODE_ONLY_FOR_FAILURE) {
+                val cachedResult = externalResponseCache!!.get(RTPKey(recipient, request.target as String, getParams))
+                if (cachedResult != null) {
+
+                    /**
+                     * got cached results - these should've come from the same type [ResponseReader]
+                     * so this must work
+                     */
+                    return HttpResult(response = _responseReader!!.stringToResponse(cachedResult))
+                }
             }
 
             throw error

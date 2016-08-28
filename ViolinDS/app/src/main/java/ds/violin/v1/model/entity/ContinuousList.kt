@@ -147,7 +147,14 @@ interface ContinuousMutableListing<L, T> : ContinuousListing<L, T> {
         if (size == 0 || error != null) {
 
             // first load or at least doesn't matter
-            return super.onDataLoaded(result, error, completion)
+            super.onDataLoaded(result, error, completion)
+
+            if (size < pageSize) {
+
+                // also loaded last ones
+                presumedSize = size
+            }
+            return
         }
 
         // got only new parts here

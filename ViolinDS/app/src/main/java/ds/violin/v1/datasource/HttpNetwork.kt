@@ -47,6 +47,7 @@ open class BaseHttpRequestSender : HttpRequestExecuting {
     override var readTimeout: Int = 60000
     override var useHttpCaches: Boolean = false
     override var externalResponseCache: Caching<RTPKey, String>? = null
+    override var externalResponseCacheMode: Int = HttpRequestExecuting.CACHE_MODE_ONLY_FOR_FAILURE
 
     override var sending: Boolean = false
     override var interrupted: Boolean = false
@@ -102,6 +103,12 @@ abstract class HttpNetwork(host: String, port: String = "") : Api, HttpSessionHa
 
     override val host: String = host
     var port: String = port
+
+    override fun createDescriptor(requestName: String, params: Any?): RequestDescriptor<*>? {
+        ensureState()
+
+        return null
+    }
 
     /**
      * load stuff from the net

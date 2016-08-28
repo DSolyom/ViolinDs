@@ -14,12 +14,15 @@
     limitations under the License.
 */
 
-package ds.violin.v1.datasource.sqlite
+package ds.violin.v1.datasource
 
 import ds.violin.v1.Global
 import ds.violin.v1.datasource.SQLiteDatabase
 import ds.violin.v1.datasource.base.RequestDescriptor
 import ds.violin.v1.datasource.networking.RTPKey
+import ds.violin.v1.datasource.sqlite.Column
+import ds.violin.v1.datasource.sqlite.SQLiteQueryParams
+import ds.violin.v1.datasource.sqlite.Table
 import ds.violin.v1.model.JSONArrayEntity
 import ds.violin.v1.util.cache.Caching
 import ds.violin.v1.util.common.Debug
@@ -110,7 +113,7 @@ class SQLiteNetworkCache : Caching<RTPKey, String> {
     override fun remove(key: RTPKey) {
 
         synchronized(theDB) {
-            var deleteStatement = "DELETE FROM $theCacheTableName WHERE recipient='$key.recipient' AND target='$key.target'"
+            var deleteStatement = "DELETE FROM ${theCacheTableName} WHERE recipient='$key.recipient' AND target='$key.target'"
             if (key.params != null) {
                 deleteStatement += " AND " + "params='" + key.params + "'"
             }
@@ -124,7 +127,7 @@ class SQLiteNetworkCache : Caching<RTPKey, String> {
     }
 
     override fun clear() {
-        theDB.getWritableDatabase(Global.context).execSQL("DELETE FROM $theCacheTableName")
+        theDB.getWritableDatabase(Global.context).execSQL("DELETE FROM ${theCacheTableName}")
         theDB.getWritableDatabase(Global.context).execSQL("vacuum")
     }
 
