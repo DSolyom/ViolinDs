@@ -43,7 +43,7 @@
                     android:tint="@color/actionbar_search_close_tint"
                     />
 
-                <EditText
+                <ds.violin.v1.widget.SearchEditText
                     android:id="@+id/et_search"
                     style="@style/Text"
                     android:textColor="@color/actionbar_search_text"

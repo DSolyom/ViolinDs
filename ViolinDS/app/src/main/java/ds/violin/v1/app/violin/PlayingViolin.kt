@@ -71,6 +71,23 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     fun isActive(): Boolean
 
     /**
+     * go back to previous activity creating result
+     *
+     * @param result
+     */
+    fun goBack(result: Serializable? = null)
+
+    /**
+     * go back to a previous activity creating result
+     * !note: make sure the previous activity is indeed an existing activity below in the activity stack
+     *        and if the target is a [Class] it will come to front for [Activity.startActivity]
+     *
+     * @param target Class or [Id]
+     * @param result
+     */
+    fun goBackTo(target: Any, result: Serializable? = null)
+
+    /**
      * override to act when receiving data from another Violin - it's generally good to call super (this)
      */
     fun onTransport(data: Serializable?): Serializable? {

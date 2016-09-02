@@ -135,6 +135,13 @@ interface FragmentViolin : PlayingViolin {
         return rootView != null && parentViolin != null
     }
 
+    override fun goBack(result: Serializable?) {
+        violinActivity.goBack(result)
+    }
+
+    override fun goBackTo(target: Any, result: Serializable?) {
+        violinActivity.goBackTo(target, result)
+    }
 
     /**
      * when this is a dialog and not a normal fragment it would handle onActivityResult instead

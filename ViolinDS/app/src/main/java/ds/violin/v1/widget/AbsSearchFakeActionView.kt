@@ -29,11 +29,9 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.support.v4.content.ContextCompat
 import android.text.Editable
-import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.EditText
+import android.view.*
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import ds.violin.v1.Global
 import ds.violin.v1.app.ViolinRecyclerViewFragment
 import ds.violin.v1.app.violin.PlayingViolin
@@ -41,6 +39,7 @@ import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.R
 import ds.violin.v1.app.ViolinActivity
 import ds.violin.v1.util.common.Debug
+import ds.violin.v1.util.common.showKeyboard
 import ds.violin.v1.viewmodel.AbsModelViewBinder
 import ds.violin.v1.viewmodel.binding.ViewBinding
 
@@ -57,7 +56,7 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
     override var Id: String = "search_fake_action_view"
     override val layoutResID: Int? = R.layout.search_fake_action_view
 
-    lateinit var searchEditText: EditText
+    lateinit var searchEditText: SearchEditText
     lateinit var fakeAVCardView: View
     lateinit var separatorView: View
 
@@ -89,7 +88,13 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
         /** create your [adapter] and [adapterViewBinder] before calling super */
 
         if (!played) {
-            searchEditText = findViewById(R.id.et_search) as EditText
+            searchEditText = findViewById(R.id.et_search) as SearchEditText
+            searchEditText.onBackListener = object : SearchEditText.OnBackListener {
+                override fun onBack() {
+                    closeDialog()
+                }
+
+            }
             fakeAVCardView = findViewById(R.id.cv_fake_action_view)!!
             separatorView = findViewById(R.id.separator)!!
 
@@ -235,6 +240,7 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
 
                                 override fun onAnimationEnd(animation: Animator?) {
                                     fakeAVCardView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+                                    showKeyboard(violinActivity as Activity, searchEditText)
                                 }
 
                                 override fun onAnimationCancel(animation: Animator?) {
@@ -270,6 +276,10 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
                         }
                     }
             )
+        } else {
+            searchEditText.post({
+                showKeyboard(violinActivity as Activity, searchEditText)
+            })
         }
     }
 
@@ -335,6 +345,24 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
 
                     }
             )
+            (on as AbsSearchFakeActionView).searchEditText.setOnEditorActionListener(
+                    TextView.OnEditorActionListener { v, actionId, event ->
+
+                        if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                                actionId == EditorInfo.IME_ACTION_DONE ||
+                                event.action === KeyEvent.ACTION_DOWN && event.keyCode === KeyEvent.KEYCODE_ENTER) {
+
+                            val on = on as AbsSearchFakeActionView
+                            on.setButtonVisibility()
+                            on.searchEditText.handler.removeCallbacks(
+                                    on.searchRunnable
+                            )
+                            on.searchRunnable.run()
+                            on.closeDialog()
+                            return@OnEditorActionListener true
+                        }
+                        false
+                    })
 
             (on as AbsSearchFakeActionView).setButtonVisibility()
 

@@ -135,7 +135,7 @@ interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerial
         }
 
         for (i in 0..till - 1) {
-            values.remove(index)
+            values.removeAt(index)
         }
     }
 

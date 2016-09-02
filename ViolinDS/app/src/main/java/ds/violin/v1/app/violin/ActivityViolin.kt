@@ -432,12 +432,7 @@ interface ActivityViolin : PlayingViolin {
         return true
     }
 
-    /**
-     * go back to previous activity creating result
-     *
-     * @param result
-     */
-    fun goBack(result: Serializable? = null) {
+    override fun goBack(result: Serializable?) {
 
         // stop everything
         stopEverything()
@@ -455,15 +450,7 @@ interface ActivityViolin : PlayingViolin {
         }
     }
 
-    /**
-     * go back to a previous activity creating result
-     * !note: make sure the previous activity is indeed an existing activity below in the activity stack
-     *        and if the target is a [Class] it will come to front for [Activity.startActivity]
-     *
-     * @param target Class or [Id]
-     * @param result
-     */
-    fun goBackTo(target: Any, result: Serializable? = null) {
+    override fun goBackTo(target: Any, result: Serializable?) {
 
         // stop everything
         stopEverything()

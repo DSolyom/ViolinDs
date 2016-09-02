@@ -201,6 +201,7 @@ interface LoadingViolin {
      */
     fun activateEntity(entityId: String) {
         idsOfLoaded.add(entityId)
+        registeredSituationalEntities[entityId]!!.entity.valid = false
     }
 
     /**
@@ -255,6 +256,20 @@ interface LoadingViolin {
             }
         }
         return true
+    }
+
+    /**
+     * @see [PlayingViolin.goBack]
+     */
+    fun goBack(result: Serializable? = null) {
+        stopEverything()
+    }
+
+    /**
+     * @see [PlayingViolin.goBackTo]
+     */
+    fun goBackTo(target: Any, result: Serializable? = null) {
+        stopEverything()
     }
 
     /**

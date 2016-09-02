@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import ds.violin.v1.R
 import ds.violin.v1.app.violin.*
 import ds.violin.v1.model.entity.SelfLoadable
+import java.io.Serializable
 import java.util.*
 
 abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin {
@@ -102,6 +103,16 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override fun onPause() {
         super<LoadingViolin>.onPause()
         super<DialogFragment>.onPause()
+    }
+
+    override fun goBack(result: Serializable?) {
+        super<LoadingViolin>.goBack(result)
+        super<FragmentViolin>.goBack(result)
+    }
+
+    override fun goBackTo(target: Any, result: Serializable?) {
+        super<LoadingViolin>.goBackTo(target, result)
+        super<FragmentViolin>.goBackTo(target, result)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

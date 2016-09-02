@@ -393,9 +393,16 @@ fun removeAllViewsRec(vg: ViewGroup) {
  * @param editResource
  */
 fun showKeyboard(a: Activity, editResource: Int) {
-    val edit = a.findViewById(editResource)
+    showKeyboard(a, a.findViewById(editResource))
+}
+
+/**
+ * @param a
+ * @param v
+ */
+fun showKeyboard(a: Activity, v: View) {
     val mgr = (a as Context).getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    mgr.showSoftInput(edit, InputMethodManager.SHOW_IMPLICIT)
+    mgr.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT)
 }
 
 /**
