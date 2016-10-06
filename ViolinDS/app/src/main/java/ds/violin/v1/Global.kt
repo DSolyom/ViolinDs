@@ -141,9 +141,9 @@ interface Global {
          * request an [ViolinActivity] to reload it's entities when it next becomes active
          * and to tell it's Violins to do their too
          */
-        fun invalidateEntitiesIn(activityId: String) {
+        fun invalidateEntitiesIn(violinId: String) {
             val editor = preferences.edit()
-            editor.putBoolean(TAG_ACTIVITY_REFRESH + activityId, true)
+            editor.putBoolean(TAG_ACTIVITY_REFRESH + violinId, true)
             editor.apply()
         }
 
@@ -151,10 +151,10 @@ interface Global {
          * check activity if data reloading is requested also presumed it's handled and remove
          * the request (id)
          */
-        fun shouldInvalidateEntities(myId: String): Boolean {
-            if (preferences.getBoolean(TAG_ACTIVITY_REFRESH + myId, false)) {
+        fun shouldInvalidateEntities(violinId: String): Boolean {
+            if (preferences.getBoolean(TAG_ACTIVITY_REFRESH + violinId, false)) {
                 val editor = preferences.edit()
-                editor.putBoolean(TAG_ACTIVITY_REFRESH + myId, false)
+                editor.putBoolean(TAG_ACTIVITY_REFRESH + violinId, false)
                 editor.apply()
                 return true
             }

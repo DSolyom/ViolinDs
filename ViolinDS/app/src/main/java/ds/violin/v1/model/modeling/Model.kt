@@ -19,6 +19,7 @@ package ds.violin.v1.model.modeling
 import android.database.Cursor
 import ds.violin.v1.datasource.sqlite.*
 import ds.violin.v1.model.entity.HasSerializableData
+import ds.violin.v1.util.common.JSONObjectWrapper
 import org.json.simple.JSONObject
 import org.json.simple.JSONValue
 import java.io.Serializable
@@ -28,11 +29,8 @@ interface GetSetModeling<VALUE> {
 
     fun has(key: String): Boolean
     operator fun get(key: String): VALUE?
-    fun put(key: String, value: VALUE?)
-
-    fun remove(key: String) {
-        put(key, null)
-    }
+    operator fun set(key: String, value: VALUE?)
+    fun remove(key: String) : VALUE?
 }
 
 interface Modeling<T, VALUE> : GetSetModeling<VALUE> {
@@ -51,16 +49,20 @@ interface MapModeling<VALUE> : IterableModeling<MutableMap<String, VALUE>, VALUE
         return values!![key]
     }
 
-    override fun put(key: String, value: VALUE?) {
+    override fun set(key: String, value: VALUE?) {
         if (value == null) {
             values!!.remove(key)
         } else {
-            values!![key] = value as VALUE
+            values!![key] = value
         }
     }
 
     override fun has(key: String): Boolean {
         return values?.containsKey(key) ?: false
+    }
+
+    override fun remove(key: String) : VALUE? {
+        return values?.remove(key)
     }
 
     fun clear() {
@@ -78,12 +80,16 @@ interface JSONModeling : IterableModeling<JSONObject, Any>, HasSerializableData,
         return values!![key]
     }
 
-    override fun put(key: String, value: Any?) {
+    override fun set(key: String, value: Any?) {
         values!!.put(key, value)
     }
 
     override fun has(key: String): Boolean {
         return values?.contains(key) ?: false
+    }
+
+    override fun remove(key: String) : Any? {
+        return values?.remove(key)
     }
 
     fun clear() {
@@ -95,11 +101,11 @@ interface JSONModeling : IterableModeling<JSONObject, Any>, HasSerializableData,
     }
 
     override fun dataToSerializable(): Serializable {
-        return values.toString()
+        return JSONObjectWrapper(values)
     }
 
     override fun createDataFrom(serializedData: Serializable) {
-        values = JSONValue.parse(serializedData as String) as JSONObject
+        values = (serializedData as JSONObjectWrapper).values!!
     }
 }
 
@@ -132,7 +138,7 @@ interface CursorModeling : Modeling<Cursor, Any> {
         return (values?.getColumnIndex(key) ?: -1) != -1
     }
 
-    override fun put(key: String, value: Any?) {
+    override fun set(key: String, value: Any?) {
         throw UnsupportedOperationException()
     }
 

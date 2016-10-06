@@ -46,7 +46,7 @@ interface LoadingViolin {
      * = ArrayList(), #Private - holds [RegisteredEntity]s for situational use (like login) - @see [registerInactiveEntity]
      * these entities are requiring loaders with ids and states won't be saved for them
      */
-    val registeredSituationalEntities: MutableMap<String, RegisteredEntity>
+    val situationalEntities: MutableMap<String, RegisteredEntity>
     /** = ArrayList(), #Private - holds all the currently loading entities @see [loadEntity] */
     val loadingEntities: MutableList<SelfLoadable>
     /** called when all registered data is loaded */
@@ -122,13 +122,13 @@ interface LoadingViolin {
      */
     fun registerInactiveEntity(entityId: String, entity: SelfLoadable,
                                completion: (entity: SelfLoadable, error: Throwable?) -> Unit) {
-        if (registeredSituationalEntities.containsKey(entityId)) {
+        if (situationalEntities.containsKey(entityId)) {
 
             // already has this entityId in
             return
         }
 
-        registeredSituationalEntities.put(entityId, RegisteredEntity(entity, completion))
+        situationalEntities.put(entityId, RegisteredEntity(entity, completion))
     }
 
     fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -152,10 +152,10 @@ interface LoadingViolin {
         for (registered in registeredEntities.values) {
             loadEntity(registered.entity, registered.completionOnLoad, true)
         }
-        for (entityId in registeredSituationalEntities.keys) {
+        for (entityId in situationalEntities.keys) {
             if (idsOfLoaded.contains(entityId)) {
-                val registered = registeredSituationalEntities[entityId]!!
-                loadEntity(registered.entity, registered.completionOnLoad, true)
+                val registered = situationalEntities[entityId]!!
+                loadEntity(registered.entity, registered.completionOnLoad, false)
             }
         }
 
@@ -201,7 +201,8 @@ interface LoadingViolin {
      */
     fun activateEntity(entityId: String) {
         idsOfLoaded.add(entityId)
-        registeredSituationalEntities[entityId]!!.entity.valid = false
+        situationalEntities[entityId]!!.entity.interrupt()
+        situationalEntities[entityId]!!.entity.valid = false
     }
 
     /**
@@ -275,7 +276,7 @@ interface LoadingViolin {
     /**
      * restoring states of registered entities and information about other [SelfLoadable] entities that were loading
      * and had [BackgroundDataLoading.loadId]
-     * states will be put in [savedStates] and are restored at [registerEntity]
+     * states will be set in [savedStates] and are restored at [registerEntity]
      * the id's of the [SelfLoadable] entities will be in [idsOfLoaded] but they're need to be handled manually
      * as the completion block is not savable and need to be re set / recreated
      *
@@ -291,7 +292,7 @@ interface LoadingViolin {
             /** ids of entities that were loading at [saveInstanceState] */
             idsOfLoaded = savedInstanceState.getStringArrayList(IDS_OF_LOADED)
 
-            /** saved parcelable data ids - put parcelable data in saved states too according to these */
+            /** saved parcelable data ids - set parcelable data in saved states too according to these */
             idsOfParcelable = savedInstanceState.getStringArrayList(IDS_OF_PARCELABLE)
             for (id in idsOfParcelable) {
                 savedStates.put(id, savedInstanceState.getParcelable(STATE_PREFIX + id))

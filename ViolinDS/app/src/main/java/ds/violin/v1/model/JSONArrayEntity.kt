@@ -29,7 +29,7 @@ import java.io.Serializable
  * list entity holding it's data in a [JSONArray]
  */
 open class JSONArrayEntity(dataLoader: DataLoading, models: JSONArray = JSONArray()) :
-        JSONArrayListModel(models), SelfLoadableListModeling<JSONArray, JSONObject> {
+        JSONArrayListModel(models), SelfLoadableListModeling<JSONArray, Any> {
 
     override var dataLoader: DataLoading = dataLoader
     override var valid: Boolean = false

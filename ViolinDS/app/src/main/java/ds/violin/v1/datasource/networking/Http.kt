@@ -231,7 +231,7 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
                     connection.setRequestProperty("Content-Length", "" + length)
                 }
 
-                val wr = PrintWriter(OutputStreamWriter(connection.outputStream, params.charset), true)
+                val wr = OutputStreamWriter(connection.outputStream, params.charset)
                 _postBodyStreamer!!.writeTo(wr)
                 wr.close()
             }
@@ -283,8 +283,12 @@ interface HttpRequestExecuting : RequestExecuting<HttpParams, String, HttpResult
                 responseStream = GZIPInputStream(responseStream)
             }
 
-            result.response = _responseReader!!
-                    .readResponse(responseStream!!, params.charset)
+            if (result.statusCode != 204) {
+                result.response = _responseReader!!
+                        .readResponse(responseStream!!, params.charset)
+            } else {
+                result.response = ""
+            }
 
             /** try to save the response to external cache for GET requests */
             if (httpMethod == "GET" && externalResponseCache != null && result.response != null) {

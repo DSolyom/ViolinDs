@@ -18,6 +18,7 @@ package ds.violin.v1.model.modeling
 
 import android.database.Cursor
 import ds.violin.v1.model.entity.HasSerializableData
+import ds.violin.v1.util.common.JSONArrayWrapper
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.JSONValue
@@ -97,34 +98,34 @@ interface MutableListModeling<VALUE> : ListModeling<MutableList<VALUE>, VALUE> {
 
 }
 
-interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerializableData {
+interface JSONArrayListModeling : ListModeling<JSONArray, Any>, HasSerializableData {
 
     override val size: Int
         get() {
             return values.size
         }
 
-    override fun get(index: Int): JSONObject {
-        return values[index] as JSONObject
+    override fun get(index: Int): Any {
+        return values[index]!!
     }
 
-    override fun add(value: JSONObject) {
+    override fun add(value: Any) {
         values.add(size, value)
     }
 
-    override fun add(index: Int, value: JSONObject) {
+    override fun add(index: Int, value: Any) {
         val jsonArray = JSONArray()
         jsonArray.add(value)
         addAll(index, jsonArray)
     }
 
-    override fun add(index: Int, value: Modeling<JSONObject, Any>) {
+    override fun add(index: Int, value: Modeling<Any, Any>) {
         val jsonArray = JSONArray()
         jsonArray.add(value.values)
         addAll(index, jsonArray)
     }
 
-    override fun contains(value: JSONObject) : Boolean {
+    override fun contains(value: Any) : Boolean {
         return values.contains(value)
     }
 
@@ -141,8 +142,8 @@ interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerial
 
     override fun addAll(index: Int, otherValues: JSONArray) {
 
-        // screw JSONArray for not having option to put at start of list or merge not to say
-        // put other JSONArray in the middle
+        // screw JSONArray for not having option to set at start of list or merge not to say
+        // set other JSONArray in the middle
         if (index == values.size) {
             for (model in otherValues) {
                 values.add(model)
@@ -176,11 +177,11 @@ interface JSONArrayListModeling : ListModeling<JSONArray, JSONObject>, HasSerial
     }
 
     override fun dataToSerializable(): Serializable {
-        return values.toString()
+        return JSONArrayWrapper(values)
     }
 
     override fun createDataFrom(serializedData: Serializable) {
-        values = JSONValue.parse(serializedData as String) as JSONArray
+        values = (serializedData as JSONArrayWrapper).values!!
     }
 }
 

@@ -215,7 +215,7 @@ open class JoinedTableSQLiteModelStatementExecutor(dbTables: Array<Table>) : SQL
                                 // maybe has position in column but not in data?
                                 if (!subdataObj.containsKey("position")) {
 
-                                    // can put position in even if there is no column for it
+                                    // can set position in even if there is no column for it
                                     // it'll be just skipped
                                     subdataObj.put("position", k);
                                 }
@@ -300,9 +300,9 @@ open class JoinedTableSQLiteModelStatementExecutor(dbTables: Array<Table>) : SQL
 
                 // vs table data if we got any
                 val paramsModel = JSONModel()
-                paramsModel.put("truncate", false)
+                paramsModel.set("truncate", false)
                 if (vsTablesData[i] != null && vsTablesData[i]!!.size > 0) {
-                    paramsModel.put("data", vsTablesData[i])
+                    paramsModel.set("data", vsTablesData[i])
                     val subRequest = RequestDescriptor<Any>(
                             findTableByName(vsTables[i], dbTables)!!,
                             paramsModel
@@ -312,8 +312,8 @@ open class JoinedTableSQLiteModelStatementExecutor(dbTables: Array<Table>) : SQL
                 }
 
                 // and bulk execute collected joined table data
-                paramsModel.put("truncate", vsTablesData[i] == null && truncate)
-                paramsModel.put("data", subRowsData[i])
+                paramsModel.set("truncate", vsTablesData[i] == null && truncate)
+                paramsModel.set("data", subRowsData[i])
                 val subRequest = RequestDescriptor<Any>(
                         findTableByName(joinedTables[i], dbTables)!!,
                         paramsModel

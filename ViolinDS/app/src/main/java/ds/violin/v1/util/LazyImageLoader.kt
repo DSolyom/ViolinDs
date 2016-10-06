@@ -115,10 +115,10 @@ object ImageLoader : LazyLoader<ImageDescriptor, Bitmap>() {
             return null;
         }
 
-        // put in bitmap cache
+        // set in bitmap cache
         LruBitmapCache.put(descriptor.prefix + descriptor.url, bmp);
 
-        // put in file cache (in another thread - so we can give this bitmap right away
+        // set in file cache (in another thread - so we can give this bitmap right away
         Thread()
         {
             FileCache.put(descriptor.prefix + descriptor.url, Bitmaps.compressBitmapToByteArray(bmp!!));

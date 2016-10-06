@@ -71,7 +71,7 @@ abstract class LazyLoader<KEY, RESULT> {
                     // new key
                     loadingQueue.put(key, arrayListOf(completion))
 
-                    // put in queue for loading
+                    // set in queue for loading
                     val loader = createLoaderFor(key, this)
                     loader.handler = Handler()
                     tpe.execute(loader)

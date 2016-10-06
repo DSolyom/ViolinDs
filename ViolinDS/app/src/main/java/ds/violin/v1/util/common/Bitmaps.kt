@@ -357,10 +357,8 @@ object Bitmaps {
 
             return bmp
         } catch (e: Throwable) {
-            e.printStackTrace()
-            return null
+            throw e
         }
-
     }
 
     /**
@@ -407,7 +405,7 @@ object Bitmaps {
     }
 
     /**
-	 *
+     *
      * @param activity
      * @param uri
      * @return
@@ -486,7 +484,7 @@ object Bitmaps {
 
         // added brightness modification by DS (january 7th, 2013)
 
-		// implemented for kotlin by DS (2016)
+        // implemented for kotlin by DS (2016)
 
         val bitmap: Bitmap
 

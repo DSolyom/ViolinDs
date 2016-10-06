@@ -123,7 +123,11 @@ interface ViewBinding {
         return view.findViewById(viewResID)
     }
 
-    fun bind(value: Any?, viewResID: Int, method: Int, on: PlayingViolin, rootView: View): Any? {
+    fun bind(value: Any?, viewResID: Int, method: Int, on: PlayingViolin?, rootView: View): Any? {
+
+        if (on == null) {
+            return null
+        }
 
         val view = findViewById(viewResID, rootView)
 

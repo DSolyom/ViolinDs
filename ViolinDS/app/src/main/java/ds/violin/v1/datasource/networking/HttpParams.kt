@@ -21,6 +21,7 @@ import ds.violin.v1.datasource.networking.HttpParams
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import java.io.PrintWriter
+import java.io.Writer
 import java.net.URLEncoder
 import java.nio.charset.Charset
 import java.security.InvalidParameterException
@@ -37,7 +38,7 @@ interface PostBodyStreamer : Interruptable {
     /**
      * write in [writer]
      */
-    fun writeTo(writer: PrintWriter)
+    fun writeTo(writer: Writer)
 }
 
 /**
@@ -62,7 +63,7 @@ class GetSerializer {
  *
  * @property formattedBody is the result for the streaming after the serializing
  */
-class PostBodyStringStreamer(params: HttpParams) : PostBodyStreamer {
+class PostBodyHtmlStreamer(params: HttpParams) : PostBodyStreamer {
 
     val formattedBody: String
     override var contentLength: Int = 0
@@ -74,10 +75,10 @@ class PostBodyStringStreamer(params: HttpParams) : PostBodyStreamer {
             else         -> params.postParams.toString()
         }
         formattedBody = URLEncoder.encode(unencodedBody, params.charset.name())
-        contentLength = formattedBody.length
+        contentLength = formattedBody.toByteArray(params.charset).size
     }
 
-    override fun writeTo(writer: PrintWriter) {
+    override fun writeTo(writer: Writer) {
         writer.write(formattedBody)
     }
 }
@@ -95,10 +96,10 @@ class HttpPostParamsStreamer(params: HttpParams) : PostBodyStreamer {
 
     init {
         formattedBody = createKeyValueAndArrayString(params.postParams, params.charset)
-        contentLength = formattedBody.length
+        contentLength = formattedBody.toByteArray(params.charset).size
     }
 
-    override fun writeTo(writer: PrintWriter) {
+    override fun writeTo(writer: Writer) {
         writer.write(formattedBody)
     }
 }
@@ -108,18 +109,22 @@ class HttpPostParamsStreamer(params: HttpParams) : PostBodyStreamer {
  *
  * @property formattedBody is the result for the streaming after the serializing
  */
-class PostStringStreamer(rawParams: HttpParams) : PostBodyStreamer {
+class PostStringStreamer(params: HttpParams, encoded: Boolean = false) : PostBodyStreamer {
 
     val formattedBody: String
     override var contentLength: Int = 0
     override var interrupted: Boolean = false
 
     init {
-        formattedBody = rawParams.postParams.toString()
-        contentLength = formattedBody.length
+        if (!encoded) {
+            formattedBody = params.postParams.toString()
+        } else {
+            formattedBody = URLEncoder.encode(params.postParams.toString(), params.charset.name())
+        }
+        contentLength = formattedBody.toByteArray(params.charset).size
     }
 
-    override fun writeTo(writer: PrintWriter) {
+    override fun writeTo(writer: Writer) {
         writer.write(formattedBody)
     }
 }

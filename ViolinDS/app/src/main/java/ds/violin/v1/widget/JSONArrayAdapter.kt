@@ -77,27 +77,29 @@ class JSONArrayAdapterDataParcelable(modelsString: String,
 
 /**
  * abstract class for the most basic [AbsHeaderedAdapter] with data held in the form of a [JSONArrayListModeling]
+ * !note: the list must contain [JSONObject]s only
  *
  * this type of adapter can be used for [IRecyclerView]s when the data is already present
  */
 abstract class JSONArrayAdapter(on: PlayingViolin, values: JSONArray = JSONArray()) :
-        AbsListModelingAdapter<JSONArray, JSONObject>(on), JSONArrayListModeling {
+        AbsListModelingAdapter<JSONArray, Any>(on), JSONArrayListModeling {
 
     override var values: JSONArray = values
 
     override fun getItemDataModel(dataPosition: Int, section: Int): Modeling<*, *> {
-        return JSONModel(get(dataPosition))
+        return JSONModel(get(dataPosition) as JSONObject)
     }
 }
 
 /**
  * abstract class for the most basic [AbsHeaderedAdapter] with data held in the form of a
  * [JSONArrayListModeling]
+ * !note: the list must contain [JSONObject]s only
  *
  * this type of adapter can be used for [IRecyclerView]s when the data requires loading
  */
 abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, values: JSONArray = JSONArray()) :
-        JSONArrayAdapter(on, values), SelfLoadableListModeling<JSONArray, JSONObject>, HasParcelableData {
+        JSONArrayAdapter(on, values), SelfLoadableListModeling<JSONArray, Any>, HasParcelableData {
 
     override var interrupted: Boolean = false
     override var valid: Boolean = false

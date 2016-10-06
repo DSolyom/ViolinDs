@@ -60,9 +60,9 @@ abstract class AbsListModelingAdapter<LIST, VALUE>(on: PlayingViolin) :
                 val sectionInfo = SectionInfo()
                 sectionInfos.add(sectionInfo)
                 if (sectionsInfo[position] is String) {
-                    sectionInfo.put("label", sectionsInfo[position] as String)
+                    sectionInfo.set("label", sectionsInfo[position] as String)
                 } else {
-                    sectionInfo.put("data", sectionsInfo[position] as Serializable)
+                    sectionInfo.set("data", sectionsInfo[position] as Serializable)
                 }
             }
             sectionPositions.add(position + offset)

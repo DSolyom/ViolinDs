@@ -27,10 +27,11 @@ import android.view.ViewGroup
 import ds.violin.v1.R
 import ds.violin.v1.app.violin.*
 import ds.violin.v1.model.entity.SelfLoadable
+import ds.violin.v1.viewmodel.binding.ViewBinding
 import java.io.Serializable
 import java.util.*
 
-abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin {
+abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin, ViewBinding {
 
     override val violins: HashMap<String, PlayingViolin> = HashMap()
     override var rootView: View? = null
@@ -40,7 +41,7 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override lateinit var violinActivity: ActivityViolin
 
     override val registeredEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
-    override val registeredSituationalEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
+    override val situationalEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
     override val loadingEntities: MutableList<SelfLoadable> = ArrayList()
     override var allDataLoadListener: LoadingViolin.AllDataLoadListener? = null
     override var savedStates: HashMap<String, Any> = HashMap()
@@ -157,5 +158,9 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin 
     override fun onConnectionChanged(connected: Boolean) {
         super<FragmentViolin>.onConnectionChanged(connected)
         super<LoadingViolin>.onConnectionChanged(connected)
+    }
+
+    fun bind(value: Any?, viewResID: Int, method: Int) {
+        bind(value, viewResID, method, violinActivity, rootView!!)
     }
 }

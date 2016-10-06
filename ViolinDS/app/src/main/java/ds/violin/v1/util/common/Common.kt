@@ -712,7 +712,7 @@ val calendarUriBase: String
     }
 
 /**
- * put event to default calendar
+ * set event to default calendar
  *
  * @param context
  * @param title

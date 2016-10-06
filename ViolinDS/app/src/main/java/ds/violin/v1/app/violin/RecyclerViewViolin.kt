@@ -92,7 +92,7 @@ interface RecyclerViewViolin {
                 registerEntity(TAG_ENTITY_ADAPTER, adapter as SelfLoadable) { adapter, error ->
                     onAdapterLoadFinished(error)
                 }
-            } else {
+            } else if (adapter != null) {
 
                 /** just bind the adapter (via [onAdapterLoadFinished]) */
                 onAdapterLoadFinished(null)
@@ -226,7 +226,7 @@ interface RecyclerViewViolin {
      * @param return
      */
     fun isListEmpty(): Boolean {
-        return (adapter !is SelfLoadable || (adapter as SelfLoadable).valid) && adapter!!.itemCount == 0
+        return (adapter != null && (adapter !is SelfLoadable || (adapter as SelfLoadable).valid) && adapter!!.itemCount == 0)
     }
 
     /**

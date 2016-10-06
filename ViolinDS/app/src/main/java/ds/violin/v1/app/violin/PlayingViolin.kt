@@ -170,7 +170,7 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
 
         if (fragmentDialog == null) {
             try {
-                fragmentDialog = dialogClass.getConstructor().newInstance() as DialogFragment?
+                fragmentDialog = dialogClass.getConstructor().newInstance() as DialogFragment
             } catch (e: Throwable) {
                 Debug.logException(e);
                 return null
@@ -194,9 +194,9 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
         val fm = (violinActivity as Activity).fragmentManager
         val fragmentDialog = fm.findFragmentByTag(tag) as DialogFragment?
 
-        val dialog = fragmentDialog!!.dialog
+        val dialog = fragmentDialog?.dialog
         if (dialog != null && dialog.isShowing) {
-            fragmentDialog.dismiss()
+            fragmentDialog!!.dismiss()
         }
     }
 
@@ -207,9 +207,16 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
 
     class RequestedPermission(val permissions: Array<String>, val completion: (Array<out String>, IntArray) -> Unit)
 
+    /**
+     * @param permissionPackId
+     * @param permissions
+     * @param completion
+     *
+     * @return - true if already has permission
+     */
     fun askUserForPermission(permissionPackId: String,
                              permissions: Array<String>,
-                             completion: (Array<out String>, IntArray) -> Unit) {
+                             completion: (Array<out String>, IntArray) -> Unit): Boolean {
         var needPermission = false
         var needRationale = false
         for(permission in permissions) {
@@ -230,10 +237,13 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
                 requestPermissions(permissions)
                 violinActivity.requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
             }
+            return false
         } else if (needPermission) {
             requestPermissions(permissions)
             violinActivity.requestedPermissions.put(permissionPackId, RequestedPermission(permissions, completion))
+            return false
         }
+        return true
     }
 
     /**

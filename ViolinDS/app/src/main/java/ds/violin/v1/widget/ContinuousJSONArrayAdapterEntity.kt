@@ -66,11 +66,12 @@ class ContinuousJSONArrayAdapterDataParcelable(modelsString: String, offset: Int
 /**
  * an adapter for loading a list continuously as scrolling which uses a [JSONArrayAdapter] as base
  * and a [ContinuousMutableListing] with [JSONArray] and [JSONObject] to load and hold the data
+ * !note: the list must contain [JSONObject]s only
  *
  * !note: the adapter's [dataLoader] should be a [BackgroundDataLoader] and [ContinuousListDataLoading]
  */
 abstract class ContinuousJSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, models: JSONArray = JSONArray()) :
-        JSONArrayAdapterEntity(on, dataLoader, models), ContinuousMutableListing<JSONArray, JSONObject> {
+        JSONArrayAdapterEntity(on, dataLoader, models), ContinuousMutableListing<JSONArray, Any> {
 
     override var offset: Int = 0
     override var presumedSize: Int? = null
@@ -102,7 +103,7 @@ abstract class ContinuousJSONArrayAdapterEntity(on: PlayingViolin, dataLoader: D
             } else {
                 Debug.logException(error)
             }
-        })!!)
+        }) as JSONObject)
     }
 
     override fun dataToParcelable(): Parcelable {

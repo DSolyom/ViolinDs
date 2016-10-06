@@ -28,13 +28,15 @@ open class BaseHttpRequestSender : HttpRequestExecuting {
      */
     companion object {
         const val METHOD_GET: Int = 1               // normal get
-        const val METHOD_POST_BODY_STRING: Int = 3  // a url encoded string is created for post body
+        const val METHOD_POST_BODY_HTML: Int = 3  // a url encoded string is created for post body
         const val METHOD_POST: Int = 4              // normal http post
-        const val METHOD_POST_RAW: Int = 5          // postParams go in as it is
-        const val METHOD_PUT_BODY_STRING: Int = 6
-        const val METHOD_PUT: Int = 7
-        const val METHOD_PUT_RAW: Int = 8
-        const val METHOD_DELETE: Int = 9
+        const val METHOD_POST_STRING: Int = 5          // postParams go in as it is
+        const val METHOD_POST_RAW: Int = 6  // postParams go in as it is just url encoded
+        const val METHOD_PUT_BODY_HTML: Int = 7
+        const val METHOD_PUT: Int = 8
+        const val METHOD_PUT_STRING: Int = 9
+        const val METHOD_PUT_RAW: Int = 10
+        const val METHOD_DELETE: Int = 11
 
         const val FORMAT_TEXT: Int = 1
         const val FORMAT_JSON: Int = 2
@@ -57,16 +59,17 @@ open class BaseHttpRequestSender : HttpRequestExecuting {
     override fun getHttpMethodFor(method: Int): String {
         return when (method) {
             METHOD_DELETE -> "GET"
-            METHOD_POST_BODY_STRING, METHOD_POST, METHOD_POST_RAW -> "POST"
-            METHOD_PUT_BODY_STRING, METHOD_PUT, METHOD_PUT_RAW -> "PUT"
+            METHOD_POST_BODY_HTML, METHOD_POST, METHOD_POST_STRING, METHOD_POST_RAW -> "POST"
+            METHOD_PUT_BODY_HTML, METHOD_PUT, METHOD_PUT_STRING, METHOD_PUT_RAW -> "PUT"
             else -> "GET"
         }
     }
 
     override fun getPostBodyStreamer(method: Int, params: HttpParams): PostBodyStreamer? {
         return when (method) {
-            METHOD_POST_BODY_STRING, METHOD_PUT_BODY_STRING -> PostBodyStringStreamer(params)
+            METHOD_POST_BODY_HTML, METHOD_PUT_BODY_HTML -> PostBodyHtmlStreamer(params)
             METHOD_POST, METHOD_PUT -> HttpPostParamsStreamer(params)
+            METHOD_POST_STRING, METHOD_PUT_STRING -> PostStringStreamer(params, true)
             else -> PostStringStreamer(params)
         }
     }
