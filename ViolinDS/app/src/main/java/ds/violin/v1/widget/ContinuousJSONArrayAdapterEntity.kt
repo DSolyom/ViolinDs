@@ -105,7 +105,7 @@ abstract class ContinuousJSONArrayAdapterEntity(on: PlayingViolin, dataLoader: D
             }
         }) as JSONObject)
     }
-
+/* this is an example if the adapter would implement HasParcelableData
     override fun dataToParcelable(): Parcelable {
         return ContinuousJSONArrayAdapterDataParcelable(values.toString(), offset)
     }
@@ -114,4 +114,5 @@ abstract class ContinuousJSONArrayAdapterEntity(on: PlayingViolin, dataLoader: D
         values = JSONValue.parse((parcelableData as ContinuousJSONArrayAdapterDataParcelable).modelsString) as JSONArray
         offset = parcelableData.offset
     }
+    */
 }

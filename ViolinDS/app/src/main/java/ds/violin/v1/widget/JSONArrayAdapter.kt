@@ -99,13 +99,13 @@ abstract class JSONArrayAdapter(on: PlayingViolin, values: JSONArray = JSONArray
  * this type of adapter can be used for [IRecyclerView]s when the data requires loading
  */
 abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading, values: JSONArray = JSONArray()) :
-        JSONArrayAdapter(on, values), SelfLoadableListModeling<JSONArray, Any>, HasParcelableData {
+        JSONArrayAdapter(on, values), SelfLoadableListModeling<JSONArray, Any> {
 
     override var interrupted: Boolean = false
     override var valid: Boolean = false
 
     override var dataLoader: DataLoading = dataLoader
-
+/* this is an example if the adapter would implement HasParcelableData
     override fun dataToParcelable(): Parcelable {
         return JSONArrayAdapterDataParcelable(values.toString(), sectionInfos, sectionPositions)
     }
@@ -114,5 +114,5 @@ abstract class JSONArrayAdapterEntity(on: PlayingViolin, dataLoader: DataLoading
         values = JSONValue.parse((parcelableData as JSONArrayAdapterDataParcelable).modelsString) as JSONArray
         sectionInfos = parcelableData.sectionInfos
         sectionPositions = parcelableData.sectionList
-    }
+    }*/
 }

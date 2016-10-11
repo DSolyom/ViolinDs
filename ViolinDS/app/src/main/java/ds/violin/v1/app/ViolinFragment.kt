@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import ds.violin.v1.R
 import ds.violin.v1.app.violin.*
 import ds.violin.v1.model.entity.SelfLoadable
+import ds.violin.v1.util.common.Debug
 import ds.violin.v1.viewmodel.binding.ViewBinding
 import java.io.Serializable
 import java.util.*
@@ -38,6 +39,7 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin,
     override var rootViewId: Int? = null
     override var parentViolin: PlayingViolin? = null
     override var played: Boolean = false
+    override var transportDone: Boolean = false
     override lateinit var violinActivity: ActivityViolin
 
     override val registeredEntities: MutableMap<String, LoadingViolin.RegisteredEntity> = HashMap()
@@ -123,11 +125,13 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin,
     }
 
     override fun saveInstanceState(outState: Bundle) {
-        super.saveInstanceState(outState)
+        super<FragmentViolin>.saveInstanceState(outState)
+        super<LoadingViolin>.saveInstanceState(outState)
     }
 
     override fun restoreInstanceState(savedInstanceState: Bundle) {
-        super.restoreInstanceState(savedInstanceState)
+        super<LoadingViolin>.restoreInstanceState(savedInstanceState)
+        super<FragmentViolin>.restoreInstanceState(savedInstanceState)
     }
 
     override fun onDestroyView() {

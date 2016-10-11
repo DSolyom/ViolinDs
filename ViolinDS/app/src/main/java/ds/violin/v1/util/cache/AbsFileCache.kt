@@ -126,7 +126,7 @@ abstract class AbsFileCache<T>(context: Context, dir: String, maxSize: Long = -1
     }
 
     /**
-     * put content into file cache
+     * set content into file cache
      */
     override fun put(filename: String, value: T): Boolean {
         synchronized (getLock(filename)) {
@@ -268,7 +268,7 @@ abstract class AbsFileCache<T>(context: Context, dir: String, maxSize: Long = -1
     protected abstract fun getObjectFromStream(inStream: FileInputStream): T
 
     /**
-     * put object to given stream
+     * set object to given stream
 
      * @param value
      * *

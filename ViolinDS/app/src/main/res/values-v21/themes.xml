@@ -1,0 +1,17 @@
+<resources>
+    <style name="Theme.App" parent="Theme.Base">
+        <item name="android:actionBarStyle">@style/Theme.App.ActionBar</item>
+        <item name="android:actionMenuTextColor">@color/actionbar_text</item>
+        <item name="android:actionBarWidgetTheme">@style/Theme.App.ActionBar.Widget</item>
+        <item name="android:textColorPrimary">@color/actionbar_title</item>
+        <item name="android:colorPrimaryDark">@color/primaryDark</item>
+        <item name="android:actionOverflowButtonStyle">@style/overflowButtonStyle</item>
+        <item name="actionOverflowButtonStyle">@style/overflowButtonStyle</item>
+        <item name="android:dropDownListViewStyle">@style/Theme.App.ActionBar.Widget.DropDown</item>
+        <item name="android:popupMenuStyle">@style/Theme.App.ActionBar.Widget.ListPopupWindow</item>
+        <item name="android:spinnerStyle">@style/Theme.App.ActionBar.Widget.Spinner</item>
+        <item name="android:itemBackground">@drawable/popupmenu_bg_selector</item>
+        <item name="android:actionDropDownStyle">@style/Theme.App.ActionBar.Widget.DropDown</item>
+        <item name="android:textColor">@color/popupmenu_text</item>
+    </style>
+</resources>

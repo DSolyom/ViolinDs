@@ -230,13 +230,17 @@ interface ActivityViolin : PlayingViolin {
 
             removeTransportData(intent)
         }
+
+        // for all intention and purposes
+        transportDone = true
+
         if (canPlay()) {
             play()
         }
     }
 
     override fun canPlay(): Boolean {
-        return rootView != null
+        return rootView != null && super.canPlay()
     }
 
     fun onNewIntent(intent: Intent) {
@@ -279,6 +283,10 @@ interface ActivityViolin : PlayingViolin {
         if (!violins.containsKey(violin.Id)) {
             if (transportData != NoTransportData) {
                 violin.onTransport(transportData)
+            } else {
+
+                // for all intention and purposes it is called
+                violin.transportDone = transportDone
             }
             if (activityResult != null) {
                 violin.onActivityResult(activityRequestCode, activityResultCode, activityResult)

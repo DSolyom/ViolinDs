@@ -55,6 +55,8 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     var parentViolin: PlayingViolin?
     /** = false - flag to indicate that [play] was called at least once after the view structure is created */
     var played: Boolean
+    /** = false - [onTransport] was called */
+    var transportDone: Boolean
 
     /**
      * fragment: lateinit - #PrivateSet - the [ActivityViolin] every [FragmentViolin] is in
@@ -94,6 +96,9 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
         for (violin in violins.values) {
             violin.onTransport(data)
         }
+
+        transportDone = true
+
         return data
     }
 
@@ -123,7 +128,7 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
      * #Protected, can call play? override when needed
      */
     fun canPlay(): Boolean {
-        return true
+        return transportDone
     }
 
     /**
@@ -149,12 +154,16 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     /**
      * restore instance state
      */
-    fun restoreInstanceState(savedInstanceState: Bundle)
+    fun restoreInstanceState(savedInstanceState: Bundle) {
+        transportDone = savedInstanceState.getSerializable("transport_called") as Boolean? ?: false
+    }
 
     /**
      * call from [Activity.onSaveInstanceState] and [Fragment.onSaveInstanceState]
      */
-    fun saveInstanceState(outState: Bundle)
+    fun saveInstanceState(outState: Bundle) {
+        outState.putSerializable("transport_called", transportDone)
+    }
 
     /** ---------------------------------------------------------------------------------------- */
 

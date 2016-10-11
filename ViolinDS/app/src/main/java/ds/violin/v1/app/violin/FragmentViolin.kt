@@ -22,22 +22,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ds.violin.v1.app.violin.PlayingViolin
 import java.io.Serializable
 
 interface FragmentViolin : PlayingViolin {
 
     override fun isActive(): Boolean {
         return (this as Fragment).userVisibleHint
-    }
-
-    override fun onTransport(data: Serializable?): Serializable? {
-
-        for (violin in violins.values) {
-            violin.onTransport(data)
-        }
-
-        return data
     }
 
     /**
@@ -132,7 +122,7 @@ interface FragmentViolin : PlayingViolin {
     }
 
     override fun canPlay(): Boolean {
-        return rootView != null && parentViolin != null
+        return rootView != null && parentViolin != null && super.canPlay()
     }
 
     override fun goBack(result: Serializable?) {

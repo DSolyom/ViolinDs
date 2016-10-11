@@ -35,11 +35,12 @@ abstract class ViolinActivity : AppCompatActivity(), ActivityViolin {
     override var rootViewId: Int? = null
     override var parentViolin: PlayingViolin? = null
     override var played: Boolean = false
+    override var transportDone: Boolean = false
     override var violinActivity: ActivityViolin = this
     override var activityActivated: Boolean = false
     override var transportData: Serializable? = NoTransportData
     override var activityResult: Any? = null
-    override var activityRequestCode:Int = ActivityViolin.TRANSPORT_ACTION_CODE
+    override var activityRequestCode: Int = ActivityViolin.TRANSPORT_ACTION_CODE
     override var activityResultCode: Int = Activity.RESULT_OK
     override var afterTransport: Boolean = false
     override var hasSceneTransition: Boolean = false
