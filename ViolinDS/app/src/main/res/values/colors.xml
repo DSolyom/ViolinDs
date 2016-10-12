@@ -15,6 +15,7 @@
     <color name="actionbar_bg">@color/primary</color>
     <color name="actionbar_text">@color/text_inverse</color>
     <color name="actionbar_title">@color/actionbar_text</color>
+    <color name="actionbar_subtitle">@color/actionbar_text</color>
     <color name="actionbar_dialog_bg">@color/actionbar_bg</color>
     <color name="actionbar_dialog_title">#33b5e5</color>
     <color name="actionbar_search_bg">#FFFFFF</color>

@@ -33,7 +33,7 @@ import ds.violin.v1.util.common.Debug
 interface LocationViolin : LocationListener {
 
     companion object {
-        const val CHECK_SETTINGS_CODE = 983450
+        const val CHECK_SETTINGS_CODE = 8345
         const val ASK_PERMISSION_LOCATION = "DS_Ask_LocationViolin_Ask_Perimission_"
 
         const val TAG_I_STATE = "__location_violin_"

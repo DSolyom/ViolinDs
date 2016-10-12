@@ -42,12 +42,15 @@
         <item name="android:background">@color/actionbar_bg</item>
         <item name="android:titleTextStyle">@style/Theme.App.ActionBarTitle</item>
         <item name="android:subtitleTextStyle">@style/Theme.App.ActionBarSubtitle</item>
+        <item name="titleTextStyle">@style/Theme.App.ActionBarTitle</item>
+        <item name="subtitleTextStyle">@style/Theme.App.ActionBarSubtitle</item>
 
         <!-- AppCompat Toolbar Up/Home button tint -->
         <item name="colorControlNormal">@color/actionbar_title</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_action_home_as_up</item>
         <!-- AppCompat Toolbar title color @#%! -->
         <item name="android:textColorPrimary">@color/actionbar_title</item>
+        <item name="android:textColorSecondary">@color/actionbar_subtitle</item>
         <item name="colorAccent">@color/accent</item>
     </style>
 
