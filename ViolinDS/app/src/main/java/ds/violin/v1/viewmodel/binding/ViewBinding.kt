@@ -23,6 +23,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.text.SpannableString
+import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.UnderlineSpan
 import android.util.Pair
@@ -96,6 +97,8 @@ interface ViewBinding {
         val ONTOUCH_LISTENER = 206
         val ONSCROLL_LISTENER = 208
         val ONCHECKEDCHANGE_LISTENER = 209
+
+        val ONTEXTCHANGED_LISTENER = 220
 
         val SELECTED_STATE = 500
         val TAG = 501
@@ -388,6 +391,10 @@ interface ViewBinding {
 
                 ONCHECKEDCHANGE_LISTENER -> {
                     (view as CompoundButton).setOnCheckedChangeListener(value as CompoundButton.OnCheckedChangeListener)
+                }
+
+                ONTEXTCHANGED_LISTENER -> {
+                    (view as TextView).addTextChangedListener(value as TextWatcher)
                 }
 
                 SELECTED_STATE -> {

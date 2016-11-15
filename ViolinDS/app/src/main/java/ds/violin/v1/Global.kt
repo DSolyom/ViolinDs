@@ -28,6 +28,8 @@ import ds.violin.v1.app.violin.PlayingViolin
 import ds.violin.v1.util.common.Debug
 import ds.violin.v1.datasource.base.SingleUseBackgroundWorkerThread
 import ds.violin.v1.datasource.sqlite.SQLiteSessionHandling
+import ds.violin.v1.extensions.getSerializable
+import ds.violin.v1.extensions.putSerializable
 import ds.violin.v1.util.ConnectionChecker
 import java.util.*
 
@@ -138,7 +140,7 @@ interface Global {
         /** --------------------------------------------------------------------------------------
          * [Activity]
          *
-         * request an [ViolinActivity] to reload it's entities when it next becomes active
+         * request an [PlayingViolin] to reload it's entities when it next becomes active
          * and to tell it's Violins to do their too
          */
         fun invalidateEntitiesIn(violinId: String) {
@@ -148,17 +150,37 @@ interface Global {
         }
 
         /**
+         * request all [PlayingViolin]s to reload their entities when it next becomes active
+         * and to tell it's Violins to do their too
+         */
+        fun invalidateEntitiesAll() {
+            val editor = preferences.edit()
+            editor.putSerializable(TAG_ACTIVITY_REFRESH + "__ALL__", ArrayList<String>())
+            editor.apply()
+        }
+
+        /**
          * check activity if data reloading is requested also presumed it's handled and remove
          * the request (id)
          */
         fun shouldInvalidateEntities(violinId: String): Boolean {
-            if (preferences.getBoolean(TAG_ACTIVITY_REFRESH + violinId, false)) {
+            val tag = TAG_ACTIVITY_REFRESH + violinId
+            var should = false
+            if (preferences.getBoolean(tag, false)) {
                 val editor = preferences.edit()
-                editor.putBoolean(TAG_ACTIVITY_REFRESH + violinId, false)
+                editor.putBoolean(tag, false)
                 editor.apply()
-                return true
+                should = true
             }
-            return false
+            @Suppress("UNCHECKED_CAST")
+            val loaded = preferences.getSerializable(TAG_ACTIVITY_REFRESH + "__ALL__", ArrayList<String>()) as ArrayList<String>
+            if (!loaded.contains(tag)) {
+                loaded.add(tag)
+                editor.putSerializable(TAG_ACTIVITY_REFRESH + "__ALL__", loaded)
+                editor.apply()
+                should = true
+            }
+            return should
         }
     }
 

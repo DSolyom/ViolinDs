@@ -23,6 +23,6 @@ package ds.violin.v1.datasource.base
  */
 interface SessionHandling<S> {
 
-    var state: S
+    var state: S?
 }
 

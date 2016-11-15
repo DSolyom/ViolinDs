@@ -26,9 +26,12 @@ import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.modeling.JSONModel
 import ds.violin.v1.model.modeling.Modeling
 import ds.violin.v1.util.common.Debug
+import ds.violin.v1.util.common.JSONArrayWrapper
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.JSONValue
+import java.io.Serializable
+import java.util.*
 
 /**
  * Parcelable data for [ContinuousJSONArrayAdapterEntity]
@@ -105,6 +108,25 @@ abstract class ContinuousJSONArrayAdapterEntity(on: PlayingViolin, dataLoader: D
             }
         }) as JSONObject)
     }
+
+    override fun dataToSerializable(): Serializable {
+        val data = HashMap<String, Any?>()
+        data.put("data", JSONArrayWrapper(values))
+        data.put("offset", offset)
+        data.put("presumed_size", presumedSize)
+        data.put("first_load", firstLoad)
+        return data
+    }
+
+    override fun createDataFrom(serializedData: Serializable) {
+        @Suppress("UNCHECKED_CAST")
+        val data = serializedData as HashMap<String, Any?>
+        values = (data["data"] as JSONArrayWrapper).values!!
+        offset = data["offset"] as Int
+        presumedSize = data["presumed_size"] as Int?
+        firstLoad = data["first_load"] as Boolean
+    }
+
 /* this is an example if the adapter would implement HasParcelableData
     override fun dataToParcelable(): Parcelable {
         return ContinuousJSONArrayAdapterDataParcelable(values.toString(), offset)

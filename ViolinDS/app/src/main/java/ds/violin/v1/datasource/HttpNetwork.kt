@@ -102,14 +102,16 @@ open class BaseHttpRequestSender : HttpRequestExecuting {
  */
 abstract class HttpNetwork(host: String, port: String = "") : Api, HttpSessionHandling {
 
-    override lateinit var state: HttpParams
+    override var state: HttpParams? = null
+        get() {
+            ensureState()
+            return field
+        }
 
     override val host: String = host
     var port: String = port
 
     override fun createDescriptor(requestName: String, params: Any?): RequestDescriptor<*>? {
-        ensureState()
-
         return null
     }
 

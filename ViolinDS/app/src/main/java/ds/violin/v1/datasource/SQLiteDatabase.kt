@@ -20,6 +20,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteStatement
+import ds.violin.v1.Global
 import ds.violin.v1.model.modeling.JSONArrayListModeling
 import ds.violin.v1.datasource.sqlite.*
 import ds.violin.v1.datasource.base.Api
@@ -140,7 +141,11 @@ abstract class SQLiteDatabase(name: String, version: Int, tables: Array<Table>, 
     override val connections: Array<TableConnection> = connections
     override val dbName: String = name
     override val dbVersion: Int = version
-    override lateinit var state: SQLiteOpenHelper
+    override var state: SQLiteOpenHelper? = null
+        get() {
+            ensureState(Global.context)
+            return field
+        }
 
     /**
      * prepare an [SQLiteQueryExecuting] for execution
@@ -151,8 +156,7 @@ abstract class SQLiteDatabase(name: String, version: Int, tables: Array<Table>, 
                 ?: throw NoSuchMethodException("Could not create request descriptor")
 
         val executor = createQueryExecutor()
-        ensureState(context)
-        executor.prepare(query, state.writableDatabase)
+        executor.prepare(query, state!!.writableDatabase)
         return executor
     }
 
@@ -172,8 +176,7 @@ abstract class SQLiteDatabase(name: String, version: Int, tables: Array<Table>, 
         }
 
         val executor = createWriteExecutor()
-        ensureState(context)
-        executor.prepare(request, state.writableDatabase)
+        executor.prepare(request, state!!.writableDatabase)
         return executor
     }
 
@@ -181,8 +184,7 @@ abstract class SQLiteDatabase(name: String, version: Int, tables: Array<Table>, 
      * get a writable [SQLiteDatabase] for your set [dbName] and [dbVersion] to do whatever you like directly
      */
     fun getWritableDatabase(context: Context): SQLiteDatabase {
-        ensureState(context)
-        return state.writableDatabase
+        return state!!.writableDatabase
     }
 
     /**

@@ -142,13 +142,19 @@ abstract class AbsMultiDataAdapter(on: PlayingViolin,
         }
     }
 
-    override fun getItemCount(): Int {
+    override fun getRealCount(): Int {
+        sectionPositions.clear()
         var count = 0
         val max = values.size - 1
         for (i in 0..max) {
-            sectionPositions.add(count)
-            count += values[i].size + 1 // +1 = the section header
+            sectionPositions.add(count + sectionPositions.size)
+            count += values[i].size
         }
+        return count
+    }
+
+    override fun getItemCount(): Int {
+        var count = getRealCount() + sectionPositions.size
         return count +
                 when (headerView) {
                     null -> 0

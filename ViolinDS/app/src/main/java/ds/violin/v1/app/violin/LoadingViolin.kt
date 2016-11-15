@@ -137,18 +137,15 @@ interface LoadingViolin {
         }
     }
 
-    fun onResume() {
+    /**
+     * call as one of the last thing you do in [PlayingViolin.play]
+     */
+    fun play() {
         if (this is PlayingViolin) {
             if (Global.shouldInvalidateEntities(Id)) {
                 invalidateRegisteredEntities(true)
             }
         }
-    }
-
-    /**
-     * call as one of the last thing you do in [PlayingViolin.play]
-     */
-    fun play() {
         for (registered in registeredEntities.values) {
             loadEntity(registered.entity, registered.completionOnLoad, true)
         }
@@ -226,9 +223,6 @@ interface LoadingViolin {
         for (registered in registeredEntities.values) {
             interruptEntity(registered.entity)
             registered.entity.valid = false
-        }
-        if (this is PlayingViolin && canPlay()) {
-            play()
         }
     }
 

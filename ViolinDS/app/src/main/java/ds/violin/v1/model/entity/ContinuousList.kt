@@ -18,6 +18,8 @@ package ds.violin.v1.model.entity
 
 import ds.violin.v1.datasource.base.DataLoading
 import ds.violin.v1.model.modeling.*
+import ds.violin.v1.util.common.JSONArrayWrapper
+import java.io.Serializable
 
 interface ContinuousListDataLoading : DataLoading {
 
@@ -48,7 +50,7 @@ interface ContinuousListing<LIST, MODEL_TYPE> : SelfLoadableListModeling<LIST, M
     /** =0, #ProtectedGet, #PrivateSet - offset change of last load (@see [loadNext] [loadPrevious] */
     var offsetChange: Int
 
-    open fun initLoader() {
+    fun initLoader() {
         if (dataLoader !is ContinuousListDataLoading) {
             throw IllegalArgumentException("dataLoader must implement ContinuousListDataLoading")
         }
@@ -58,7 +60,7 @@ interface ContinuousListing<LIST, MODEL_TYPE> : SelfLoadableListModeling<LIST, M
         )
     }
 
-    open fun get(position: Int, completion: (entity: SelfLoadable, error: Throwable?) -> Unit): MODEL_TYPE? {
+    fun get(position: Int, completion: (entity: SelfLoadable, error: Throwable?) -> Unit): MODEL_TYPE? {
         when {
             position + 1 > size - pageSize / 3 -> loadNext(completion)
             position - 1 < pageSize / 3 -> loadPrevious(completion)

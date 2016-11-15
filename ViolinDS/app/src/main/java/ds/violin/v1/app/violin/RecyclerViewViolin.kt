@@ -226,7 +226,11 @@ interface RecyclerViewViolin {
      * @param return
      */
     fun isListEmpty(): Boolean {
-        return (adapter != null && (adapter !is SelfLoadable || (adapter as SelfLoadable).valid) && adapter!!.itemCount == 0)
+        val count = when (adapter is AbsHeaderedAdapter) {
+            true -> (adapter as AbsHeaderedAdapter).getRealCount()
+            false -> adapter!!.itemCount
+        }
+        return (adapter != null && (adapter !is SelfLoadable || (adapter as SelfLoadable).valid) && count == 0)
     }
 
     /**

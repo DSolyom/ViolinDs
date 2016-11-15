@@ -158,8 +158,8 @@ interface ActivityViolin : PlayingViolin {
     fun onResume() {
         afterTransport = false
 
-        if (Global.shouldInvalidateEntities(this.Id)) {
-            invalidateRegisteredEntities(true)
+        if (canPlay()) {
+            play()
         }
     }
 

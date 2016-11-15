@@ -106,6 +106,11 @@ abstract class AbsHeaderedAdapter(on: PlayingViolin) : AbsRecyclerViewAdapter(on
     abstract fun onBindViewHolder(binder: AbsModelRecyclerViewItemBinder, position: Int)
 
     /**
+     * returns real item count - excluding sections or header and footer
+     */
+    abstract fun getRealCount(): Int
+
+    /**
      * get data [Modeling] for the row to bind
      * !note: usually this creates modeling with value get(dataPosition), exception is mostly when the
      *        adapter's data is provided from another list in which case [get] usually unsupported

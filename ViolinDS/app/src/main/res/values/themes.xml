@@ -35,11 +35,11 @@
 
     </style>
 
-    <style name="Theme.Base.ActionBar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+    <style name="Theme.Base.ActionBar" parent="Widget.AppCompat.Light.ActionBar">
     </style>
 
     <style name="Theme.App.ActionBar" parent="Theme.Base.ActionBar">
-        <item name="android:background">@color/actionbar_bg</item>
+        <item name="android:itemBackground">@color/actionbar_bg</item>
         <item name="android:titleTextStyle">@style/Theme.App.ActionBarTitle</item>
         <item name="android:subtitleTextStyle">@style/Theme.App.ActionBarSubtitle</item>
         <item name="titleTextStyle">@style/Theme.App.ActionBarTitle</item>

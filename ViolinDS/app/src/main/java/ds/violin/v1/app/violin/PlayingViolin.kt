@@ -42,7 +42,7 @@ interface PlayingViolin : ConnectionChecker.ConnectionChangedListener {
     /** = HashMap(), sub controllers (ie. fragments in an activity, ...) */
     val violins: HashMap<String, PlayingViolin>
 
-    /** =unique id - Id of this controller - can be null for abstract use */
+    /** =unique id - Id of this controller - ie. to be able to refresh it's data in case of a [LoadingViolin] */
     var Id: String
 
     /** layout resource ID to inflate / set to content view */

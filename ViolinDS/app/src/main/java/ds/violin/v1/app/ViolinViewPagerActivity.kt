@@ -94,11 +94,6 @@ abstract class ViolinViewPagerActivity : ViolinActivity(), ViewPagerViolin, Load
         super<ViolinActivity>.stopEverything()
     }
 
-    override fun onResume() {
-        super<ViolinActivity>.onResume()
-        super<LoadingViolin>.onResume()
-    }
-
     override fun onPause() {
         super<LoadingViolin>.onPause()
         super<ViolinActivity>.onPause()

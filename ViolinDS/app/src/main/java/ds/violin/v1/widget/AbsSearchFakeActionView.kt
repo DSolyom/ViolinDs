@@ -57,11 +57,13 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
     override val layoutResID: Int? = R.layout.search_fake_action_view
 
     lateinit var searchEditText: SearchEditText
+    var initialText: String? = null
     lateinit var fakeAVCardView: View
     lateinit var separatorView: View
 
     var playBinder: AbsModelViewBinder? = null
     var closing = false
+    var donePressed: Boolean = false
 
     val searchRunnable = Runnable { startSearch() }
     val searchDelay = 500L
@@ -87,6 +89,8 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
 
         /** create your [adapter] and [adapterViewBinder] before calling super */
 
+        donePressed = false
+
         if (!played) {
             searchEditText = findViewById(R.id.et_search) as SearchEditText
             searchEditText.onBackListener = object : SearchEditText.OnBackListener {
@@ -102,6 +106,10 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
             playBinder!!.bind(null)
 
             openDialog()
+        }
+        if (initialText != null) {
+            searchEditText.setText(initialText)
+            initialText = null
         }
 
         super.play()
@@ -308,7 +316,7 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
      */
     open protected fun startSearch() {
         try {
-            onSearchTextChanged(searchEditText.text.toString())
+            onSearchTextChanged(searchEditText.text.toString(), donePressed)
         } catch(e: Throwable) {
             Debug.logException(e)
         }
@@ -317,9 +325,9 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
     /**
      * receive search text change
      */
-    abstract fun onSearchTextChanged(searchText: String)
+    abstract fun onSearchTextChanged(searchText: String, donePressed: Boolean = false)
 
-    open class PlayBinder(on: PlayingViolin, view: View) : AbsModelViewBinder(on, view) {
+    inner open class PlayBinder(on: PlayingViolin, view: View) : AbsModelViewBinder(on, view) {
 
         override fun bind(model: Modeling<*, *>?) {
             (on as AbsSearchFakeActionView).searchEditText.addTextChangedListener(
@@ -357,6 +365,7 @@ abstract class AbsSearchFakeActionView : ViolinRecyclerViewFragment(), FullScree
                             on.searchEditText.handler.removeCallbacks(
                                     on.searchRunnable
                             )
+                            donePressed = true
                             on.searchRunnable.run()
                             on.closeDialog()
                             return@OnEditorActionListener true

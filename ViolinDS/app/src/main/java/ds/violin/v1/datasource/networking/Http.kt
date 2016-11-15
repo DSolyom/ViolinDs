@@ -91,28 +91,27 @@ interface HttpSessionHandling : SessionHandling<HttpParams> {
     }
 
     fun mergeRequestWithState(request: RequestDescriptor<HttpParams>) {
-        ensureState()
 
         // it would be best if implementation of HttpSessionHandling would create it's
         // cookieManager in it's constructor but just to make sure
-        if (state.cookieManager == null) {
-            state.cookieManager = CookieManager()
+        if (state!!.cookieManager == null) {
+            state!!.cookieManager = CookieManager()
         }
 
         val params = request.params as HttpParams
 
-        params.cookieManager = state.cookieManager
+        params.cookieManager = state!!.cookieManager
 
-        ParamsMerger<String, String>().merge(params.headers, state.headers)
-        ParamsMerger<String, Any>().merge(params.getParams, state.getParams)
+        ParamsMerger<String, String>().merge(params.headers, state!!.headers)
+        ParamsMerger<String, Any>().merge(params.getParams, state!!.getParams)
         when (params.postParams) {
             is HashMap<*, *> -> {
-                if (state.postParams != null) {
+                if (state!!.postParams != null) {
                     ParamsMerger<String, Any>().merge(params.postParams as HashMap<String, Any>,
-                            state.postParams as HashMap<String, Any>)
+                            state!!.postParams as HashMap<String, Any>)
                 }
             }
-            null -> params.postParams = state.postParams
+            null -> params.postParams = state!!.postParams
         }
     }
 

@@ -109,8 +109,12 @@ abstract class AbsListModelingAdapter<LIST, VALUE>(on: PlayingViolin) :
         }
     }
 
+    override fun getRealCount(): Int {
+        return size
+    }
+
     override fun getItemCount(): Int {
-        return size + sectionPositions.size +
+        return getRealCount() + sectionPositions.size +
                 when (headerView) {
                     null -> 0
                     else -> 1

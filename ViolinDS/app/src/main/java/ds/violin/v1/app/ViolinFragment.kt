@@ -99,7 +99,6 @@ abstract class ViolinFragment : DialogFragment(), FragmentViolin, LoadingViolin,
 
     override fun onResume() {
         super<DialogFragment>.onResume()
-        super<LoadingViolin>.onResume()
         super<FragmentViolin>.onResume()
     }
 
